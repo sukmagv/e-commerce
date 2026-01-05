@@ -2,9 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use App\Http\Requests\LoginRequest;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\RegisterRequest;
+use App\Modules\Auth\Actions\LoginAction;
+use App\Modules\Auth\DTOs\CustomerLoginDTO;
 use App\Modules\Auth\Actions\RegisterAction;
 use App\Modules\Auth\DTOs\CustomerRegisterDTO;
 use Symfony\Component\HttpFoundation\Response;
@@ -25,5 +29,28 @@ class AuthController extends Controller
         $customer = $action->execute($dto);
 
         return response()->json($customer, Response::HTTP_OK);
+    }
+
+    public function login(LoginRequest $request, LoginAction $action): JsonResponse
+    {
+        $dto = CustomerLoginDTO::fromRequest($request);
+
+        $user = $action->execute($dto);
+
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        return response()->json([
+            'data' => [
+                'user' => $user,
+                'token' => $token,
+            ],
+        ], Response::HTTP_OK);
+    }
+
+    public function logout(Request $request)
+    {
+        $request->user()->currentAccessToken()->delete();
+
+        return response()->json(Response::HTTP_OK);
     }
 }
