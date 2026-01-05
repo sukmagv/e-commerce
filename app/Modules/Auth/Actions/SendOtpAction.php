@@ -11,6 +11,14 @@ use App\Modules\Auth\Notifications\SendOtpNotification;
 
 class SendOtpAction
 {
+    /**
+     * Check request OTP attemps and generate OTP
+     * Send OTP via email
+     *
+     * @param string $address
+     * @param integer|null $otpId
+     * @return Otp
+     */
     public function execute(string $address, ?int $otpId = null): Otp
     {
         $otp = (string) random_int(100000, 999999);

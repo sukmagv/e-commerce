@@ -10,6 +10,13 @@ class VerifyOtpAction
 {
     protected int $maxAttempts = 3;
 
+    /**
+     * Verify submitted OTP
+     *
+     * @param integer $id
+     * @param string $code
+     * @return boolean
+     */
     public function execute(int $id, string $code): bool
     {
         $record = Otp::query()

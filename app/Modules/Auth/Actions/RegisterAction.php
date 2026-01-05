@@ -14,7 +14,14 @@ use Illuminate\Http\Exceptions\HttpResponseException;
 
 class RegisterAction
 {
-    public function execute(CustomerRegisterDTO $dto)
+    /**
+     * Check email already verified or not
+     * Create new user and customer data
+     *
+     * @param CustomerRegisterDTO $dto
+     * @return array
+     */
+    public function execute(CustomerRegisterDTO $dto): array
     {
         $otp = Otp::query()
             ->where('id', $dto->otp_id)
@@ -23,7 +30,7 @@ class RegisterAction
             ->latest('verified_at')
             ->first();
 
-        if (! $otp) {
+        if (!$otp) {
             throw new HttpResponseException(
                 response()->json(Response::HTTP_UNPROCESSABLE_ENTITY)
             );
@@ -37,6 +44,7 @@ class RegisterAction
         ]);
 
         $photoPath = null;
+
         if ($dto->photo instanceof UploadedFile) {
             $photoPath = $dto->photo->store('uploads', 'public');
         }
@@ -58,6 +66,12 @@ class RegisterAction
         return $customer;
     }
 
+    /**
+     * Generate customer code
+     *
+     * @param string $name
+     * @return string
+     */
     protected function generateCustomerCode(string $name): string
     {
         $initials = collect(explode(' ', strtoupper($name)))

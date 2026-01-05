@@ -10,7 +10,13 @@ use Illuminate\Http\Exceptions\HttpResponseException;
 
 class LoginAction
 {
-    public function execute(CustomerLoginDTO $dto)
+    /**
+     * Check email and password for login
+     *
+     * @param CustomerLoginDTO $dto
+     * @return User
+     */
+    public function execute(CustomerLoginDTO $dto): User
     {
         $user = User::query()
             ->where('email', $dto->email)
@@ -18,7 +24,9 @@ class LoginAction
 
         if (!$user || !Hash::check($dto->password, $user->password)) {
             throw new HttpResponseException(
-                response()->json(['message' => 'Email or password is incorrect'], Response::HTTP_UNAUTHORIZED)
+                response()->json([
+                    'message' => 'Email or password is incorrect'
+                ], Response::HTTP_UNAUTHORIZED)
             );
         }
 

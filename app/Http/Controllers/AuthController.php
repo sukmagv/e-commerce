@@ -31,6 +31,13 @@ class AuthController extends Controller
         return response()->json($customer, Response::HTTP_OK);
     }
 
+    /**
+     * Customer login and generate access token
+     *
+     * @param LoginRequest $request
+     * @param LoginAction $action
+     * @return JsonResponse
+     */
     public function login(LoginRequest $request, LoginAction $action): JsonResponse
     {
         $dto = CustomerLoginDTO::fromRequest($request);
@@ -47,7 +54,14 @@ class AuthController extends Controller
         ], Response::HTTP_OK);
     }
 
-    public function logout(Request $request)
+    /**
+     * Customer logout
+     *
+     * @param Request $request
+     * @return void
+     * @return JsonResponse
+     */
+    public function logout(Request $request): JsonResponse
     {
         $request->user()->currentAccessToken()->delete();
 
