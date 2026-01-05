@@ -5,6 +5,7 @@ namespace App\Modules\Auth\Actions;
 use App\Modules\Auth\Models\User;
 use Illuminate\Support\Facades\Hash;
 use App\Modules\Auth\DTOs\CustomerLoginDTO;
+use App\Modules\Auth\Models\Customer;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
@@ -14,9 +15,9 @@ class LoginAction
      * Check email and password for login
      *
      * @param CustomerLoginDTO $dto
-     * @return User
+     * @return array
      */
-    public function execute(CustomerLoginDTO $dto): User
+    public function execute(CustomerLoginDTO $dto): array
     {
         $user = User::query()
             ->where('email', $dto->email)
@@ -30,6 +31,20 @@ class LoginAction
             );
         }
 
-        return $user;
+        $token = $user->createToken('auth_token')->plainTextToken;
+
+        $customer = Customer::query()
+            ->where('user_id', $user->id)
+            ->first();
+
+        $data = array_merge(
+            $user->only(['id', 'name', 'email']),
+            $customer->only(['phone', 'photo']),
+        );
+
+        return [
+            'data' => $data,
+            'token' => $token,
+        ];
     }
 }
