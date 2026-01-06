@@ -20,8 +20,6 @@ class RegisterAction
      */
     public function execute(CustomerRegisterDTO $dto)
     {
-        $photoPath = null;
-
         try {
             $customer = DB::transaction(function () use ($dto, &$photoPath) {
                 $user = User::create([

@@ -72,7 +72,6 @@ class User extends Authenticatable
 
     public function generateToken(): string
     {
-        $name = $this->name;
-        return $this->createToken($name)->plainTextToken;
+        return $this->createToken($this->name)->plainTextToken;
     }
 }

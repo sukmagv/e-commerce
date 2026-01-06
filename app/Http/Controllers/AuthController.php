@@ -11,6 +11,7 @@ use App\Modules\Auth\Actions\LoginAction;
 use App\Modules\Auth\DTOs\CustomerLoginDTO;
 use App\Modules\Auth\Actions\RegisterAction;
 use App\Modules\Auth\DTOs\CustomerRegisterDTO;
+use Illuminate\Http\Resources\Json\JsonResource;
 
 class AuthController extends Controller
 {
@@ -19,15 +20,15 @@ class AuthController extends Controller
      *
      * @param \App\Http\Requests\RegisterRequest $request
      * @param \App\Modules\Auth\Actions\RegisterAction $action
-     * @return JsonResponse
+     * @return JsonResource
      */
-    public function register(RegisterRequest $request, RegisterAction $action): JsonResponse
+    public function register(RegisterRequest $request, RegisterAction $action): JsonResource
     {
         $dto = CustomerRegisterDTO::fromRequest($request);
 
         $customer = $action->execute($dto);
 
-        return new JsonResponse($customer);
+        return JsonResource::make($customer);
 
     }
 
@@ -36,15 +37,15 @@ class AuthController extends Controller
      *
      * @param \App\Http\Requests\LoginRequest $request
      * @param \App\Modules\Auth\Actions\LoginAction $action
-     * @return JsonResponse
+     * @return JsonResource
      */
-    public function login(LoginRequest $request, LoginAction $action): JsonResponse
+    public function login(LoginRequest $request, LoginAction $action): JsonResource
     {
         $dto = CustomerLoginDTO::fromRequest($request);
 
         $user = $action->execute($dto);
 
-        return new JsonResponse($user);
+        return JsonResource::make($user);
     }
 
     /**

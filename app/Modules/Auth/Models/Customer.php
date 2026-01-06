@@ -2,6 +2,7 @@
 
 namespace App\Modules\Auth\Models;
 
+use App\Traits\HasUser;
 use App\Models\BaseModel;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Notifications\Notifiable;
@@ -9,7 +10,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Customer extends BaseModel
 {
-    use HasApiTokens, HasFactory, Notifiable;
+    use HasApiTokens, HasFactory, Notifiable, HasUser;
 
     protected $fillable = [
         'user_id',
@@ -26,15 +27,10 @@ class Customer extends BaseModel
         'field' => 'name',
     ];
 
-    public function user()
-    {
-        return $this->belongsTo(User::class);
-    }
-
     public static function createWithUser(array $attributes, User $user)
     {
-        $attributes['code'] = static::generateCode($user->name, 'CUS');
-    
+        $attributes['code'] = static::generateCode($user->name, (new static)->code_prefix);
+
         return static::create($attributes);
     }
 }
