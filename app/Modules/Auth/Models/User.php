@@ -69,4 +69,10 @@ class User extends Authenticatable
     {
         $this->attributes['password'] = Hash::needsRehash($value) ? Hash::make($value) : $value;
     }
+
+    public function generateToken(): string
+    {
+        $name = $this->name;
+        return $this->createToken($name)->plainTextToken;
+    }
 }

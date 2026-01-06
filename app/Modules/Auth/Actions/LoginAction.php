@@ -14,7 +14,7 @@ class LoginAction
     /**
      * Check email and password for login
      *
-     * @param CustomerLoginDTO $dto
+     * @param \App\Modules\Auth\DTOs\CustomerLoginDTO $dto
      * @return array
      */
     public function execute(CustomerLoginDTO $dto): array
@@ -31,7 +31,7 @@ class LoginAction
             );
         }
 
-        $token = $user->createToken('auth_token')->plainTextToken;
+        $token = $user->generateToken();
 
         $customer = Customer::query()
             ->where('user_id', $user->id)

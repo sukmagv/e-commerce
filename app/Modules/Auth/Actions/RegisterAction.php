@@ -2,16 +2,12 @@
 
 namespace App\Modules\Auth\Actions;
 
-use App\Modules\Auth\Models\Otp;
 use App\Modules\Auth\Models\User;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
 use App\Modules\Auth\Models\Customer;
 use Illuminate\Support\Facades\Storage;
 use App\Modules\Auth\DTOs\CustomerRegisterDTO;
-use Symfony\Component\HttpFoundation\Response;
-use Illuminate\Http\Exceptions\HttpResponseException;
 
 class RegisterAction
 {
@@ -50,6 +46,8 @@ class RegisterAction
 
                 $customer = Customer::createWithUser($data, $user);
 
+                $token = $user->generateToken();
+
                 return [
                     'user_id' => $user->id,
                     'code' => $customer->code,
@@ -57,6 +55,7 @@ class RegisterAction
                     'email' => $user->email,
                     'phone' => $customer->phone,
                     'photo' => $customer->photo ? Storage::url($customer->photo) : null,
+                    'token' => $token,
                 ];
             });
 
@@ -71,7 +70,7 @@ class RegisterAction
             throw $e;
         }
 
-        $otp->delete();
+        // $otp->delete();
 
         return $data;
     }

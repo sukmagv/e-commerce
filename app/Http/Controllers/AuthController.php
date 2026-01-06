@@ -11,8 +11,6 @@ use App\Modules\Auth\Actions\LoginAction;
 use App\Modules\Auth\DTOs\CustomerLoginDTO;
 use App\Modules\Auth\Actions\RegisterAction;
 use App\Modules\Auth\DTOs\CustomerRegisterDTO;
-use Illuminate\Http\Resources\Json\JsonResource;
-use Symfony\Component\HttpFoundation\Response;
 
 class AuthController extends Controller
 {
