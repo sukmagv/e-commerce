@@ -11,6 +11,7 @@ use App\Modules\Auth\Actions\LoginAction;
 use App\Modules\Auth\DTOs\CustomerLoginDTO;
 use App\Modules\Auth\Actions\RegisterAction;
 use App\Modules\Auth\DTOs\CustomerRegisterDTO;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Symfony\Component\HttpFoundation\Response;
 
 class AuthController extends Controller
@@ -18,8 +19,8 @@ class AuthController extends Controller
     /**
      * Create user and customer data
      *
-     * @param RegisterRequest $request
-     * @param RegisterAction $action
+     * @param \App\Http\Requests\RegisterRequest $request
+     * @param \App\Modules\Auth\Actions\RegisterAction $action
      * @return JsonResponse
      */
     public function register(RegisterRequest $request, RegisterAction $action): JsonResponse
@@ -28,14 +29,15 @@ class AuthController extends Controller
 
         $customer = $action->execute($dto);
 
-        return response()->json($customer, Response::HTTP_OK);
+        return new JsonResponse($customer);
+
     }
 
     /**
      * Customer login and generate access token
      *
-     * @param LoginRequest $request
-     * @param LoginAction $action
+     * @param \App\Http\Requests\LoginRequest $request
+     * @param \App\Modules\Auth\Actions\LoginAction $action
      * @return JsonResponse
      */
     public function login(LoginRequest $request, LoginAction $action): JsonResponse
@@ -44,20 +46,19 @@ class AuthController extends Controller
 
         $user = $action->execute($dto);
 
-        return response()->json($user, Response::HTTP_OK);
+        return new JsonResponse($user);
     }
 
     /**
      * Customer logout
      *
-     * @param Request $request
-     * @return void
+     * @param \Illuminate\Http\Request $request
      * @return JsonResponse
      */
     public function logout(Request $request): JsonResponse
     {
         $request->user()->currentAccessToken()->delete();
 
-        return response()->json(Response::HTTP_OK);
+        return new JsonResponse();
     }
 }

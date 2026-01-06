@@ -5,6 +5,7 @@ namespace App\Modules\Auth\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use App\Modules\Auth\Models\Role;
 use Laravel\Sanctum\HasApiTokens;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -59,4 +60,13 @@ class User extends Authenticatable
         return $this->hasOne(Customer::class);
     }
 
+    public static function customerRole(): int
+    {
+        return Role::where('name', 'customer')->value('id');
+    }
+
+    protected function setPasswordAttribute($value)
+    {
+        $this->attributes['password'] = Hash::needsRehash($value) ? Hash::make($value) : $value;
+    }
 }
