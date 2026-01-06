@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->string('code')->unique();
-            $table->string('phone');
-            $table->string('photo');
+            $table->string('phone')->nullable();
+            $table->string('photo')->nullable();
             $table->boolean('is_blocked')->default(false);
             $table->timestamps();
         });
