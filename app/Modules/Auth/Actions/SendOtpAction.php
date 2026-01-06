@@ -4,10 +4,10 @@ namespace App\Modules\Auth\Actions;
 
 use App\Modules\Auth\Models\Otp;
 use App\Modules\Auth\Enums\OtpType;
-use Illuminate\Support\Facades\Notification;
+use Illuminate\Support\Facades\Mail;
+use App\Modules\Auth\Mail\SendOtpMail;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Http\Exceptions\HttpResponseException;
-use App\Modules\Auth\Notifications\SendOtpNotification;
 
 class SendOtpAction
 {
@@ -57,8 +57,7 @@ class SendOtpAction
             ]);
         }
 
-        Notification::route('mail', $address)
-            ->notify(new SendOtpNotification($otp));
+        Mail::to($address)->send(new SendOtpMail($otp));
 
         return $record;
     }
