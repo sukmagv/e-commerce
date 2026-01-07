@@ -7,6 +7,7 @@ use Illuminate\Http\JsonResponse;
 use App\Http\Requests\LoginRequest;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\RegisterRequest;
+use App\Http\Resources\CustomerResource;
 use App\Modules\Auth\Actions\LoginAction;
 use App\Modules\Auth\DTOs\CustomerLoginDTO;
 use App\Modules\Auth\Actions\RegisterAction;
@@ -26,10 +27,9 @@ class AuthController extends Controller
     {
         $dto = CustomerRegisterDTO::fromRequest($request);
 
-        $customer = $action->execute($dto);
+        $customerData = $action->execute($dto);
 
-        return JsonResource::make($customer);
-
+        return new CustomerResource($customerData);
     }
 
     /**

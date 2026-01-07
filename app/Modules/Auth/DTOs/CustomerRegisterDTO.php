@@ -31,4 +31,11 @@ class CustomerRegisterDTO
 
         return $dto;
     }
+
+    public function toCustomerData(): array
+    {
+        return [
+            'phone' => $this->phone,
+        ];
+    }
 }

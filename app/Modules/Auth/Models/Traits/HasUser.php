@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Traits;
+namespace App\Modules\Auth\Models\Traits;
 
 use App\Modules\Auth\Models\User;
 

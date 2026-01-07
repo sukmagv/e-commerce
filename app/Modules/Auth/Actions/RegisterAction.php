@@ -16,50 +16,42 @@ class RegisterAction
      * Create new user and customer data
      *
      * @param \App\Modules\Auth\DTOs\CustomerRegisterDTO $dto
-     * @return
+     * @return array
      */
-    public function execute(CustomerRegisterDTO $dto)
+    public function execute(CustomerRegisterDTO $dto): array
     {
+        $photoPath = null;
+
+        DB::beginTransaction();
         try {
-            $customer = DB::transaction(function () use ($dto, &$photoPath) {
-                $user = User::create([
-                    'role_id' => User::customerRole(),
-                    'name' => $dto->name,
-                    'email' => $dto->email,
-                    'password' => $dto->password,
-                ]);
+            $user = User::create([
+                'role_id' => User::customerRole(),
+                'name' => $dto->name,
+                'email' => $dto->email,
+                'password' => $dto->password,
+            ]);
 
-                $data = [
-                    'user_id' => $user->id,
-                ];
+            $customerData = $dto->toCustomerData();
 
-                if (!empty($dto->phone)) {
-                    $data['phone'] = $dto->phone;
-                }
+            if ($dto->photo instanceof UploadedFile) {
+                $photoPath = $dto->photo->store('uploads', 'public');
+                $customerData['photo'] = $photoPath;
+            }
 
-                if ($dto->photo instanceof UploadedFile) {
-                    $photoPath = $dto->photo->store('uploads', 'public');
-                    $data['photo'] = $photoPath;
-                }
+            $customer = Customer::createWithUser($customerData, $user);
 
-                $customer = Customer::createWithUser($data, $user);
+            $token = $user->generateToken();
 
-                $token = $user->generateToken();
+            DB::commit();
 
-                return [
-                    'user_id' => $user->id,
-                    'code' => $customer->code,
-                    'name' => $user->name,
-                    'email' => $user->email,
-                    'phone' => $customer->phone,
-                    'photo' => $customer->photo ? Storage::url($customer->photo) : null,
-                    'token' => $token,
-                ];
-            });
-
-            return $customer;
+            return [
+                'user' => $user,
+                'customer' => $customer,
+                'token' => $token,
+            ];
 
         } catch (\Throwable $e) {
+            DB::rollBack();
 
             if ($photoPath && Storage::disk('public')->exists($photoPath)) {
                 Storage::disk('public')->delete($photoPath);
@@ -69,7 +61,5 @@ class RegisterAction
         }
 
         // $otp->delete();
-
-        return $data;
     }
 }
