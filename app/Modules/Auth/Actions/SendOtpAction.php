@@ -25,13 +25,7 @@ class SendOtpAction
         $expiredAt = now()->addMinutes(10);
         $blockTime = 30;
 
-        $otp = $dto->otp_id
-            ? Otp::find($dto->otp_id)
-            : Otp::query()
-                ->where('address', $dto->address)
-                ->where('type', $dto->type)
-                ->latest('id')
-                ->first();
+        $otp = Otp::find($dto->otp_id);
 
         if ($otp && $otp->attempt >= 3 &&
             now()->lt($otp->expired_at->copy()->addMinutes($blockTime))
