@@ -19,36 +19,36 @@ class VerifyOtpAction
      */
     public function execute(int $id, string $code): bool
     {
-        $record = Otp::query()
+        $otp = Otp::query()
             ->where('id', $id)
             ->whereNull('verified_at')
             ->where('expired_at', '>', now())
             ->first();
 
-        if (!$record) {
+        if (!$otp) {
             throw new HttpResponseException(response()->json([
                 'message' => 'OTP expired',
             ], Response::HTTP_UNPROCESSABLE_ENTITY));
         }
 
-        if (!hash_equals($record->code, hash('sha256', $code))) {
-            $record->attempt = ($record->attempt ?? 0) + 1;
+        if (!hash_equals($otp->code, hash('sha256', $code))) {
+            $otp->attempt = ($otp->attempt ?? 0) + 1;
 
-            if ($record->attempt >= 3) {
-                $record->expired_at = now();
+            if ($otp->attempt >= 3) {
+                $otp->expired_at = now();
             }
 
-            $record->save();
+            $otp->save();
 
             throw new HttpResponseException(response()->json([
                 'message' => 'OTP invalid',
-                'attempt' => $record->attempt
+                'attempt' => $otp->attempt
             ], Response::HTTP_UNPROCESSABLE_ENTITY));
         }
 
-        $record->update([
+        $otp->update([
             'verified_at' => now(),
-            'attempt' => ($record->attempt ?? 0) + 1
+            'attempt' => ($otp->attempt ?? 0) + 1
         ]);
 
         return true;
