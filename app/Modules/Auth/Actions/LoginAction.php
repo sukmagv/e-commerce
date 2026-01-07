@@ -37,14 +37,10 @@ class LoginAction
             ->where('user_id', $user->id)
             ->first();
 
-        $data = array_merge(
-            $user->only(['id', 'name', 'email']),
-            $customer->only(['phone', 'photo']),
-        );
-
         return [
-            'data' => $data,
-            'token' => $token,
+                'user' => $user,
+                'customer' => $customer,
+                'token' => $token,
         ];
     }
 }
