@@ -14,7 +14,7 @@ return new class extends Migration
         Schema::create('otps', function (Blueprint $table) {
             $table->id();
             $table->string('code')->unique()->nullable();
-            $table->unsignedTinyInteger('type')->nullable();
+            $table->string('type')->nullable();
             $table->unsignedInteger('attempt')->nullable();
             $table->string('address')->nullable();
             $table->timestamp('verified_at')->nullable();

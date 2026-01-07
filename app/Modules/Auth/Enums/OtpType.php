@@ -2,8 +2,8 @@
 
 namespace App\Modules\Auth\Enums;
 
-enum OtpType: int
+enum OtpType: string
 {
-    case EMAIL = 1;
-    case PHONE = 2;
+    case EMAIL = 'email';
+    case PHONE = 'phone';
 }

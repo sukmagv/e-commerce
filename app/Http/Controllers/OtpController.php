@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use App\Modules\Auth\Actions\SendOtpAction;
 use App\Modules\Auth\Actions\VerifyOtpAction;
+use App\Modules\Auth\DTOs\SendOtpDTO;
 use Symfony\Component\HttpFoundation\Response;
 
 class OtpController extends Controller
@@ -20,7 +21,9 @@ class OtpController extends Controller
      */
     public function sendOtp(OtpRequest $request, SendOtpAction $action): JsonResponse
     {
-        $otp = $action->execute($request->address);
+        $dto = SendOtpDTO::fromRequest($request);
+
+        $action->execute($dto);
 
         return new JsonResponse();
     }

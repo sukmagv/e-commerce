@@ -2,6 +2,7 @@
 
 namespace App\Modules\Auth\Actions;
 
+use App\Modules\Auth\DTOs\SendOtpDTO;
 use App\Modules\Auth\Models\Otp;
 use App\Modules\Auth\Enums\OtpType;
 use Illuminate\Support\Facades\Mail;
@@ -12,53 +13,55 @@ use Illuminate\Http\Exceptions\HttpResponseException;
 class SendOtpAction
 {
     /**
-     * Check request OTP attemps and generate OTP
-     * Send OTP via email
+     * Generate and send OTP
      *
-     * @param string $address
-     * @param integer|null $otpId
-     * @return Otp
+     * @param \App\Modules\Auth\DTOs\SendOtpDTO $dto
+     * @return bool
      */
-    public function execute(string $address, ?int $otpId = null): Otp
+    public function execute(SendOtpDTO $dto): bool
     {
-        $otp = (string) random_int(100000, 999999);
-        $hashedOtp = hash('sha256', $otp);
+        $code      = (string) random_int(100000, 999999);
+        $hashedCode = hash('sha256', $code);
         $expiredAt = now()->addMinutes(10);
         $blockTime = 30;
 
-        if ($otpId) {
-            $record = Otp::find($otpId);
-        } else {
-            $record = Otp::query()
-                ->where('address', $address)
+        $otp = $dto->otp_id
+            ? Otp::find($dto->otp_id)
+            : Otp::query()
+                ->where('address', $dto->address)
+                ->where('type', $dto->type)
                 ->latest('id')
                 ->first();
+
+        if ($otp && $otp->attempt >= 3 &&
+            now()->lt($otp->expired_at->copy()->addMinutes($blockTime))
+        ) {
+            throw new HttpResponseException(
+                response()->json(
+                    ['message' => 'Maximum attempts reached. Try again in 30 minutes.'],
+                    Response::HTTP_TOO_MANY_REQUESTS
+                )
+            );
         }
 
-        if ($record) {
-            if ($record->attempt >= 3 && now()->lt($record->expired_at->copy()->addMinutes($blockTime))) {
-                throw new HttpResponseException(response()->json([
-                    'message' => 'Maximum attempts reached. Try again in 30 minutes.'
-                ], Response::HTTP_TOO_MANY_REQUESTS));
-            }
-
-            $record->update([
-                'code'       => $hashedOtp,
+        if ($otp) {
+            $otp->update([
+                'code'       => $hashedCode,
                 'expired_at' => $expiredAt,
                 'attempt'    => 0,
             ]);
         } else {
-            $record = Otp::create([
-                'address'    => $address,
+            $otp = Otp::create([
+                'address'    => $dto->address,
                 'type'       => OtpType::EMAIL,
-                'code'       => $hashedOtp,
+                'code'       => $hashedCode,
                 'expired_at' => $expiredAt,
                 'attempt'    => 0,
             ]);
         }
 
-        Mail::to($address)->send(new SendOtpMail($otp));
+        Mail::to($dto->address)->send(new SendOtpMail($code));
 
-        return $record;
+        return true;
     }
 }
