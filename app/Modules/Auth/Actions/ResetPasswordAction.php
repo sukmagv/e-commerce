@@ -4,15 +4,17 @@ namespace App\Modules\Auth\Actions;
 
 use App\Modules\Auth\Models\Otp;
 use App\Modules\Auth\Models\User;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
-use App\Modules\Auth\Models\Customer;
-use Illuminate\Support\Facades\Storage;
 use App\Modules\Auth\DTOs\ResetPasswordDTO;
-use App\Modules\Auth\DTOs\CustomerRegisterDTO;
 
 class ResetPasswordAction
 {
+    /**
+     * Update password
+     *
+     * @param \App\Modules\Auth\DTOs\ResetPasswordDTO $dto
+     * @return boolean
+     */
     public function execute(ResetPasswordDTO $dto): bool
     {
         DB::beginTransaction();

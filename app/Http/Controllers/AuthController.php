@@ -57,7 +57,7 @@ class AuthController extends Controller
      * Customer logout
      *
      * @param \Illuminate\Http\Request $request
-     * @return JsonResponse
+     * @return \Illuminate\Http\JsonResponse
      */
     public function logout(Request $request): JsonResponse
     {
@@ -66,8 +66,14 @@ class AuthController extends Controller
         return new JsonResponse();
     }
 
-
-    public function forgotPassword(ForgotPasswordRequest $request, ForgotPasswordAction $action)
+    /**
+     * Send OTP for forgot password request
+     *
+     * @param \App\Http\Requests\ForgotPasswordRequest $request
+     * @param \App\Modules\Auth\Actions\ForgotPasswordAction $action
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function forgotPassword(ForgotPasswordRequest $request, ForgotPasswordAction $action): JsonResponse
     {
         $dto = ForgotPasswordDTO::fromRequest($request);
 
@@ -76,7 +82,14 @@ class AuthController extends Controller
         return new JsonResponse();
     }
 
-    public function resetPassword(ResetPasswordRequest $request, ResetPasswordAction $action)
+    /**
+     * Update password for selected user data
+     *
+     * @param \App\Http\Requests\ResetPasswordRequest $request
+     * @param \App\Modules\Auth\Actions\ResetPasswordAction $action
+     * @return \Illuminate\Http\JsonResponse
+     */
+    public function resetPassword(ResetPasswordRequest $request, ResetPasswordAction $action): JsonResponse
     {
         $dto = ResetPasswordDTO::fromRequest($request);
 

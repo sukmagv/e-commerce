@@ -11,6 +11,12 @@ use Illuminate\Http\Exceptions\HttpResponseException;
 
 class ForgotPasswordAction
 {
+    /**
+     * Generate and send OTP
+     *
+     * @param \App\Modules\Auth\DTOs\ForgotPasswordDTO $dto
+     * @return boolean
+     */
     public function execute(ForgotPasswordDTO $dto): bool
     {
         $code      = (string) random_int(100000, 999999);
