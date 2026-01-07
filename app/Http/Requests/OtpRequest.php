@@ -2,7 +2,9 @@
 
 namespace App\Http\Requests;
 
+use Illuminate\Validation\Rule;
 use App\Http\Requests\BaseRequest;
+use App\Modules\Auth\Enums\OtpType;
 
 class OtpRequest extends BaseRequest
 {
@@ -14,8 +16,9 @@ class OtpRequest extends BaseRequest
     public function rules(): array
     {
         return [
-            'otp_id' => 'nullable|integer',
-            'address' => 'required|email',
+            'otp_id' => ['nullable', 'integer'],
+            'address' => ['required', 'email', 'unique:otps,address'],
+            'type' => ['required', Rule::enum(OtpType::class)],
         ];
     }
 }
