@@ -3,10 +3,8 @@
 namespace App\Modules\Auth\Actions;
 
 use App\Modules\Auth\Models\User;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use App\Modules\Auth\Models\Customer;
-use Illuminate\Support\Facades\Storage;
 use App\Modules\Auth\DTOs\CustomerRegisterDTO;
 
 class RegisterAction
@@ -16,9 +14,9 @@ class RegisterAction
      * Create new user and customer data
      *
      * @param \App\Modules\Auth\DTOs\CustomerRegisterDTO $dto
-     * @return array
+     * @return \App\Modules\Auth\Models\Customer
      */
-    public function execute(CustomerRegisterDTO $dto): array
+    public function execute(CustomerRegisterDTO $dto): Customer
     {
         $photoPath = null;
 
@@ -31,35 +29,32 @@ class RegisterAction
                 'password' => $dto->password,
             ]);
 
-            $customerData = $dto->toCustomerData();
+            $customer = new Customer($dto->toCustomerData());
 
-            if ($dto->photo instanceof UploadedFile) {
-                $photoPath = $dto->photo->store('uploads', 'public');
-                $customerData['photo'] = $photoPath;
+            if ($dto->photo) {
+                $photoPath = $customer->savePhoto($dto->photo);
+                $customer->photo = $photoPath;
             }
 
-            $customer = Customer::createWithUser($customerData, $user);
+            $customer->user()->associate($user);
+            $customer->save();
 
             $token = $user->generateToken();
 
-            DB::commit();
+            $customer->token = $token;
 
-            return [
-                'user' => $user,
-                'customer' => $customer,
-                'token' => $token,
-            ];
+            DB::commit();
 
         } catch (\Throwable $e) {
             DB::rollBack();
 
-            if ($photoPath && Storage::disk('public')->exists($photoPath)) {
-                Storage::disk('public')->delete($photoPath);
-            }
+            $customer->deletePhoto($photoPath);
 
             throw $e;
         }
 
         // $otp->delete();
+
+        return $customer;
     }
 }

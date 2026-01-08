@@ -27,8 +27,6 @@ class ResetPasswordAction
 
             DB::commit();
 
-            return true;
-
         } catch (\Throwable $e) {
             DB::rollBack();
 
@@ -36,5 +34,7 @@ class ResetPasswordAction
         }
 
         // $otp->delete();
+        
+        return true;
     }
 }

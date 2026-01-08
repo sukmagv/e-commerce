@@ -48,9 +48,7 @@ class AuthController extends Controller
     {
         $dto = CustomerLoginDTO::fromRequest($request);
 
-        $customerData = $action->execute($dto);
-
-        return new CustomerResource($customerData);
+        return new CustomerResource($action->execute($dto));
     }
 
     /**

@@ -15,9 +15,9 @@ class LoginAction
      * Check email and password for login
      *
      * @param \App\Modules\Auth\DTOs\CustomerLoginDTO $dto
-     * @return array
+     * @return \App\Modules\Auth\Models\Customer
      */
-    public function execute(CustomerLoginDTO $dto): array
+    public function execute(CustomerLoginDTO $dto): Customer
     {
         $user = User::query()
             ->where('email', $dto->email)
@@ -37,10 +37,8 @@ class LoginAction
             ->where('user_id', $user->id)
             ->first();
 
-        return [
-                'user' => $user,
-                'customer' => $customer,
-                'token' => $token,
-        ];
+        $customer->token = $token;
+
+        return $customer;
     }
 }

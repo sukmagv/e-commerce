@@ -15,6 +15,10 @@ class Role extends Model
         'name',
     ];
 
+    protected $casts = [
+        'slug' => 'string'
+    ];
+
     public function users()
     {
         return $this->hasMany(User::class);
