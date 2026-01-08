@@ -32,8 +32,6 @@ class UpdateProfileAction
                 $user->customer->update($customerData);
             }
 
-            $user->load('customer', 'role');
-
             DB::commit();
 
         } catch (\Throwable $e) {
