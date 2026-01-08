@@ -2,11 +2,10 @@
 
 namespace App\Modules\Auth\Actions;
 
-use Illuminate\Http\Request;
 use App\Modules\Auth\Models\User;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
+use App\Http\Requests\UpdateProfileRequest;
 
 class UpdateProfileAction
 {
@@ -14,10 +13,10 @@ class UpdateProfileAction
      * Update one or more customer profile
      *
      * @param \App\Modules\Auth\Models\User $user
-     * @param \Illuminate\Http\Request $request
+     * @param \App\Http\Requests\UpdateProfileRequest $request
      * @return \App\Modules\Auth\Models\User
      */
-    public function execute(User $user, Request $request): User
+    public function execute(User $user, UpdateProfileRequest $request): User
     {
         DB::beginTransaction();
         try {
@@ -26,28 +25,23 @@ class UpdateProfileAction
             $customerData = $request->only('phone');
 
             if ($request->hasFile('photo') && $request->file('photo') instanceof UploadedFile) {
-                $path = $request->file('photo')->store('uploads', 'public');
-                $customerData['photo'] = $path;
-
-                if ($user->customer && $user->customer->photo) {
-                    Storage::disk('public')->delete($user->customer->photo);
-                }
+                $customerData['photo'] = $user->customer->savePhoto($request->file('photo'));
             }
 
             if ($user->customer && $customerData) {
                 $user->customer->update($customerData);
             }
 
+            $user->load('customer', 'role');
+
             DB::commit();
-
-            $user = User::with(['customer', 'role'])->find($user->id);
-
-            return $user;
 
         } catch (\Throwable $e) {
             DB::rollBack();
 
             throw $e;
         }
+
+        return $user;
     }
 }

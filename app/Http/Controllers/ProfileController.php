@@ -11,6 +11,7 @@ use App\Http\Requests\ChangePasswordRequest;
 use App\Modules\Auth\Actions\UpdateProfileAction;
 use App\Modules\Auth\Actions\ChangePasswordAction;
 use App\Modules\Auth\DTOs\ChangePasswordDTO;
+use Illuminate\Support\Facades\Auth;
 
 class ProfileController extends Controller
 {
@@ -22,9 +23,7 @@ class ProfileController extends Controller
      */
     public function getProfile(Request $request): ProfileResource
     {
-        $user = $request->user();
-
-        $user = User::with(['customer', 'role'])->find($user->id);
+        $user = $request->user()->loadMissing('customer', 'role');
 
         return new ProfileResource($user);
     }
@@ -38,9 +37,7 @@ class ProfileController extends Controller
      */
     public function updateProfile(UpdateProfileRequest $request, UpdateProfileAction $action): ProfileResource
     {
-        $user = $request->user();
-
-        $updatedUser = $action->execute($user, $request);
+        $updatedUser = $action->execute($request->user(), $request);
 
         return new ProfileResource($updatedUser);
     }

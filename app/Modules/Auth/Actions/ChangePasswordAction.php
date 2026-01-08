@@ -2,7 +2,6 @@
 
 namespace App\Modules\Auth\Actions;
 
-use App\Modules\Auth\Models\Otp;
 use App\Modules\Auth\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -33,12 +32,12 @@ class ChangePasswordAction
 
             DB::commit();
 
-            return true;
-
         } catch (\Throwable $e) {
             DB::rollBack();
 
             throw $e;
         }
+
+        return true;
     }
 }
