@@ -2,8 +2,6 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
-use App\Modules\Auth\Models\User;
 use Illuminate\Http\JsonResponse;
 use App\Http\Resources\ProfileResource;
 use App\Http\Requests\UpdateProfileRequest;
@@ -18,14 +16,11 @@ class ProfileController extends Controller
     /**
      * Retrieve customer profile
      *
-     * @param \Illuminate\Http\Request $request
      * @return \App\Http\Resources\ProfileResource
      */
-    public function getProfile(Request $request): ProfileResource
+    public function getProfile(): ProfileResource
     {
-        $user = $request->user()->loadMissing('customer', 'role');
-
-        return new ProfileResource($user);
+        return new ProfileResource(Auth::user());
     }
 
     /**
