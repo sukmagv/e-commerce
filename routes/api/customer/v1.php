@@ -1,10 +1,10 @@
 <?php
 
-use App\Http\Controllers\AuthController;
-use App\Http\Controllers\OtpController;
-use App\Http\Controllers\ProfileController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\Customer\v1\OtpController;
+use App\Http\Controllers\Customer\v1\AuthController;
+use App\Http\Controllers\Customer\v1\ProductController;
+use App\Http\Controllers\Customer\v1\ProfileController;
 
 Route::post('otp/send', [OtpController::class, 'sendOtp']);
 Route::post('otp/verify', [OtpController::class, 'verifyOtp']);
@@ -16,8 +16,10 @@ Route::prefix('auth')->group(function () {
         Route::post('/forgot-password', 'forgotPassword');
         Route::post('/reset-password', 'resetPassword');
     });
+});
 
-    Route::middleware('auth:sanctum')->group(function () {
+Route::middleware('auth:sanctum')->group(function () {
+    Route::prefix('auth')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout']);
 
         Route::controller(ProfileController::class)->group(function () {
@@ -26,4 +28,5 @@ Route::prefix('auth')->group(function () {
             Route::post('/profile', 'changePassword');
         });
     });
+    Route::resource('products', ProductController::class)->only(['index', 'show']);
 });
