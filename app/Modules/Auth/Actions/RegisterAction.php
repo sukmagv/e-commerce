@@ -10,12 +10,8 @@ use App\Modules\Auth\DTOs\CustomerRegisterDTO;
 
 class RegisterAction
 {
-    protected $fileService;
-
-    public function __construct(FileService $fileService)
-    {
-        $this->fileService = $fileService;
-    }
+    public function __construct(protected FileService $fileService)
+    {}
 
     /**
      * Check email already verified or not

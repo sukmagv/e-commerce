@@ -17,7 +17,6 @@ class UpdateProfileRequest extends BaseRequest
         $userId = $this->user()->id;
 
         return [
-            'email' => ['sometimes', 'email', Rule::unique('users', 'email')->ignore($userId)],
             'name'  => ['sometimes', 'string', 'max:255'],
             'phone' => ['sometimes', 'string', 'min:11', 'regex:/^[0-9]+$/'],
             'photo' => ['sometimes', 'file', 'image', 'mimes:jpeg,png,jpg', 'max:2048'],

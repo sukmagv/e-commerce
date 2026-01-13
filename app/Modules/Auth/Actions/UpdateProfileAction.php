@@ -12,7 +12,7 @@ class UpdateProfileAction
 {
     public function __construct(protected FileService $fileService)
     {}
-    
+
     /**
      * Update one or more customer profile
      *
@@ -24,7 +24,7 @@ class UpdateProfileAction
     {
         DB::beginTransaction();
         try {
-            $user->update($request->only('name', 'email'));
+            $user->update($request->only('name'));
 
             $customerData = $request->only('phone');
 
