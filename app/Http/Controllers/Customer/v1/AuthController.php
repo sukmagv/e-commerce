@@ -1,21 +1,21 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Customer\v1;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
-use App\Http\Requests\LoginRequest;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\ForgotPasswordRequest;
-use App\Http\Requests\RegisterRequest;
-use App\Http\Resources\CustomerResource;
+use App\Http\Requests\Customer\v1\LoginRequest;
+use App\Http\Requests\Customer\v1\RegisterRequest;
 use App\Modules\Auth\Actions\LoginAction;
-use App\Http\Requests\ResetPasswordRequest;
+use App\Http\Resources\v1\CustomerResource;
 use App\Modules\Auth\DTOs\CustomerLoginDTO;
 use App\Modules\Auth\DTOs\ResetPasswordDTO;
 use App\Modules\Auth\Actions\RegisterAction;
 use App\Modules\Auth\DTOs\ForgotPasswordDTO;
+use App\Http\Requests\Customer\v1\ResetPasswordRequest;
 use App\Modules\Auth\DTOs\CustomerRegisterDTO;
+use App\Http\Requests\Customer\v1\ForgotPasswordRequest;
 use App\Modules\Auth\Actions\ResetPasswordAction;
 use App\Modules\Auth\Actions\ForgotPasswordAction;
 
@@ -24,9 +24,9 @@ class AuthController extends Controller
     /**
      * Create user and customer data
      *
-     * @param \App\Http\Requests\RegisterRequest $request
+     * @param \App\Http\Requests\Customer\v1\RegisterRequest $request
      * @param \App\Modules\Auth\Actions\RegisterAction $action
-     * @return \App\Http\Resources\CustomerResource
+     * @return \App\Http\Resources\v1\CustomerResource
      */
     public function register(RegisterRequest $request, RegisterAction $action): CustomerResource
     {
@@ -40,9 +40,9 @@ class AuthController extends Controller
     /**
      * Customer login and generate access token
      *
-     * @param \App\Http\Requests\LoginRequest $request
+     * @param \App\Http\Requests\Customer\v1\LoginRequest $request
      * @param \App\Modules\Auth\Actions\LoginAction $action
-     * @return \App\Http\Resources\CustomerResource
+     * @return \App\Http\Resources\v1\CustomerResource
      */
     public function login(LoginRequest $request, LoginAction $action): CustomerResource
     {
@@ -67,7 +67,7 @@ class AuthController extends Controller
     /**
      * Send OTP for forgot password request
      *
-     * @param \App\Http\Requests\ForgotPasswordRequest $request
+     * @param \App\Http\Requests\Customer\v1\ForgotPasswordRequest $request
      * @param \App\Modules\Auth\Actions\ForgotPasswordAction $action
      * @return \Illuminate\Http\JsonResponse
      */
@@ -83,7 +83,7 @@ class AuthController extends Controller
     /**
      * Update password for selected user data
      *
-     * @param \App\Http\Requests\ResetPasswordRequest $request
+     * @param \App\Http\Requests\Customer\v1\ResetPasswordRequest $request
      * @param \App\Modules\Auth\Actions\ResetPasswordAction $action
      * @return \Illuminate\Http\JsonResponse
      */

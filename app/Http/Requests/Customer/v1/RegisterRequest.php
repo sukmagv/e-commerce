@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Customer\v1;
 
+use App\Rules\VerifiedOtp;
 use Illuminate\Validation\Rule;
 use App\Http\Requests\BaseRequest;
-use App\Rules\VerifiedOtp;
 
 class RegisterRequest extends BaseRequest
 {

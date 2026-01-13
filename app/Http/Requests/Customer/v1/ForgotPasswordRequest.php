@@ -1,8 +1,8 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Customer\v1;
 
-use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\BaseRequest;
 
 class ForgotPasswordRequest extends BaseRequest
 {
@@ -15,7 +15,7 @@ class ForgotPasswordRequest extends BaseRequest
     {
         return [
             'otp_id' => ['nullable', 'integer'],
-            'address' => ['required', 'email', 'unique:otps,address'],
+            'address' => ['required', 'email', 'exists:users,email'],
         ];
     }
 }
