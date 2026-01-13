@@ -34,7 +34,7 @@ class UpdateProfileAction
             $oldPath = $user->customer->photo;
 
             if ($request->hasFile('photo') && $request->file('photo') instanceof UploadedFile) {
-                $customerData['photo'] = $this->fileService->updateOrUpload($request->photo, $oldPath, 'profile');
+                $customerData['photo'] = $this->fileService->updateOrCreate($request->photo, $oldPath, 'profile');
             }
 
             if ($user->customer && $customerData) {

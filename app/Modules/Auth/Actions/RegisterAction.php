@@ -40,7 +40,7 @@ class RegisterAction
             $customer = new Customer($dto->toCustomerData());
 
             if ($dto->photo) {
-                $path = $this->fileService->updateOrUpload($dto->photo, null, 'profile');
+                $path = $this->fileService->updateOrCreate($dto->photo, null, 'profile');
                 $customer->photo = $path;
             }
 

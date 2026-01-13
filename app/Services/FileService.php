@@ -16,7 +16,7 @@ class FileService
      * @param string $disk
      * @return string|null
      */
-    public function updateOrUpload(?UploadedFile $file, ?string $oldPath = null, string $folder = 'uploads', string $disk = 'public'): ?string
+    public function updateOrCreate(?UploadedFile $file, ?string $oldPath = null, string $folder = 'uploads', string $disk = 'public'): ?string
     {
         if (!$file) {
             return $oldPath;
