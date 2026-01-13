@@ -10,6 +10,9 @@ trait HasCode
     {
         return [
             'Customer' => 'CUS',
+            'ProductCategory' => 'PCA',
+            'Product' => 'PRD',
+            'Order' => 'ORD',
         ];
     }
 
