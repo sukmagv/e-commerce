@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Customer\v1;
 use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
-use App\Http\Resources\v1\ProfileResource;
+use App\Http\Resources\ProfileResource;
 use App\Modules\Auth\DTOs\ChangePasswordDTO;
 use App\Http\Requests\Customer\v1\UpdateProfileRequest;
 use App\Http\Requests\Customer\v1\ChangePasswordRequest;
@@ -34,7 +34,7 @@ class ProfileController extends Controller
      *
      * @param \App\Http\Requests\Customer\v1\UpdateProfileRequest $request
      * @param \App\Modules\Auth\Actions\UpdateProfileAction $action
-     * @return \App\Http\Resources\v1\ProfileResource
+     * @return \App\Http\Resources\ProfileResource
      */
     public function updateProfile(UpdateProfileRequest $request, UpdateProfileAction $action): ProfileResource
     {

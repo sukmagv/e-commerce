@@ -10,12 +10,9 @@ use App\Http\Requests\Customer\v1\UpdateProfileRequest;
 
 class UpdateProfileAction
 {
-    protected $fileService;
-
-    public function __construct(FileService $fileService)
-    {
-        $this->fileService = $fileService;
-    }
+    public function __construct(protected FileService $fileService)
+    {}
+    
     /**
      * Update one or more customer profile
      *

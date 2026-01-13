@@ -8,7 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Customer\v1\LoginRequest;
 use App\Http\Requests\Customer\v1\RegisterRequest;
 use App\Modules\Auth\Actions\LoginAction;
-use App\Http\Resources\v1\CustomerResource;
+use App\Http\Resources\CustomerResource;
 use App\Modules\Auth\DTOs\CustomerLoginDTO;
 use App\Modules\Auth\DTOs\ResetPasswordDTO;
 use App\Modules\Auth\Actions\RegisterAction;
@@ -26,7 +26,7 @@ class AuthController extends Controller
      *
      * @param \App\Http\Requests\Customer\v1\RegisterRequest $request
      * @param \App\Modules\Auth\Actions\RegisterAction $action
-     * @return \App\Http\Resources\v1\CustomerResource
+     * @return \App\Http\Resources\CustomerResource
      */
     public function register(RegisterRequest $request, RegisterAction $action): CustomerResource
     {
@@ -42,7 +42,7 @@ class AuthController extends Controller
      *
      * @param \App\Http\Requests\Customer\v1\LoginRequest $request
      * @param \App\Modules\Auth\Actions\LoginAction $action
-     * @return \App\Http\Resources\v1\CustomerResource
+     * @return \App\Http\Resources\CustomerResource
      */
     public function login(LoginRequest $request, LoginAction $action): CustomerResource
     {
