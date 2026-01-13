@@ -52,9 +52,14 @@ return [
 
     'channels' => [
 
+        // 'stack' => [
+        //     'driver' => 'stack',
+        //     'channels' => explode(',', (string) env('LOG_STACK', 'single')),
+        //     'ignore_exceptions' => false,
+        // ],
         'stack' => [
-            'driver' => 'stack',
-            'channels' => explode(',', (string) env('LOG_STACK', 'single')),
+            'driver'            => 'stack',
+            'channels'          => ['daily'],
             'ignore_exceptions' => false,
         ],
 
@@ -65,12 +70,18 @@ return [
             'replace_placeholders' => true,
         ],
 
+        // 'daily' => [
+        //     'driver' => 'daily',
+        //     'path' => storage_path('logs/laravel.log'),
+        //     'level' => env('LOG_LEVEL', 'debug'),
+        //     'days' => env('LOG_DAILY_DAYS', 14),
+        //     'replace_placeholders' => true,
+        // ],
         'daily' => [
             'driver' => 'daily',
-            'path' => storage_path('logs/laravel.log'),
-            'level' => env('LOG_LEVEL', 'debug'),
-            'days' => env('LOG_DAILY_DAYS', 14),
-            'replace_placeholders' => true,
+            'path'   => storage_path('logs/laravel.log'),
+            'level'  => env('LOG_LEVEL', 'debug'),
+            'days'   => 14,
         ],
 
         'slack' => [
