@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Schema;
 use App\Modules\Product\Models\Product;
+use App\Modules\Product\Models\ProductCategory;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Validator;
 
@@ -34,6 +35,7 @@ class AppServiceProvider extends ServiceProvider
 
         $models = [
             'product'  => Product::class,
+            'product-category'  => ProductCategory::class,
         ];
 
         foreach ($models as $key => $modelClass) {

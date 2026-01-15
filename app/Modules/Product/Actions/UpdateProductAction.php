@@ -6,6 +6,7 @@ use App\Services\FileService;
 use Illuminate\Support\Facades\DB;
 use App\Modules\Product\Models\Product;
 use App\Modules\Product\DTOs\UpdateProductDTO;
+use App\Modules\Product\Models\ProductDiscount;
 
 class UpdateProductAction
 {
@@ -25,6 +26,8 @@ class UpdateProductAction
 
         DB::beginTransaction();
         try {
+            // soft delete product ketika product sudah pernah diorder, update biasa ketika belum pernah masuk ke order
+
             $oldPath = $product->photo;
 
             $newProductData = [
@@ -39,6 +42,20 @@ class UpdateProductAction
             }
 
             $product->update($newProductData);
+
+            if ($dto->type && $dto->amount !== null && $dto->final_price !== null) {
+                $discount = new ProductDiscount([
+                    'type'        => $dto->type,
+                    'amount'      => $dto->amount,
+                    'final_price' => $dto->final_price,
+                ]);
+
+                $discount->product()->associate($product);
+                $discount->save();
+            }
+
+            // discount lama di soft delete jika sudah pernah diorder atau ada perubahan product price
+            // update biasa jika belum ada di order
 
             DB::commit();
 

@@ -27,19 +27,19 @@ class CreateProductAction
 
         DB::beginTransaction();
         try {
-            $this->validateDiscountCalculation($dto);
-
-            if ($dto->photo) {
-                $path = $this->fileService->updateOrCreate($dto->photo, null, 'products');
-            }
-
-            $product = Product::create([
+            $product = new Product([
                 'category_id' => $dto->category_id,
                 'name' => $dto->name,
-                'photo' => $path,
                 'price' => $dto->price,
                 'is_discount' => $dto->is_discount,
             ]);
+
+            if ($dto->photo) {
+                $path = $this->fileService->updateOrCreate($dto->photo, null, 'products');
+                $product->photo = $path;
+            }
+
+            $product->save();
 
             if ($dto->is_discount) {
                 $discount = new ProductDiscount([
@@ -73,32 +73,31 @@ class CreateProductAction
      * @param \App\Modules\Product\DTOs\CreateProductDTO $dto
      * @return void
      */
-    protected function validateDiscountCalculation(CreateProductDTO $dto): void
-    {
-        if (!$dto->is_discount) {
-            return;
-        }
+    // protected function validateDiscountCalculation(CreateProductDTO $dto): void
+    // {
+    //     if (!$dto->is_discount) {
+    //         return;
+    //     }
 
-        $expectedFinalPrice = match ($dto->type) {
-            DiscountType::NOMINAL =>
-                $dto->price - $dto->amount,
+    //     $expectedFinalPrice = match ($dto->type) {
+    //         DiscountType::NOMINAL => $dto->price - $dto->amount,
 
-            DiscountType::PERCENTAGE =>
-                $dto->price - ($dto->price * $dto->amount / 100),
+    //         DiscountType::PERCENTAGE => $dto->price - ($dto->price * $dto->amount / 100),
 
-            default => $dto->price,
-        };
+    //         default => $dto->price,
+    //     };
 
-        if ($expectedFinalPrice < 0) {
-            throw new InvalidArgumentException(
-                "The discount amount exceeds the product price."
-            );
-        }
+    //     // pengecekan untuk mencegah harga barang negatif setelah diberi diskon
+    //     if ($expectedFinalPrice < 0) {
+    //         throw new InvalidArgumentException(
+    //             "The discount amount exceeds the product price."
+    //         );
+    //     }
 
-        if (round($expectedFinalPrice) !== round($dto->final_price)) {
-            throw new InvalidArgumentException(
-                "The final price calculation is not valid." . $expectedFinalPrice
-            );
-        }
-    }
+    //     if (round($expectedFinalPrice) !== round($dto->final_price)) {
+    //         throw new InvalidArgumentException(
+    //             "The final price calculation is not valid. Expected price = " . $expectedFinalPrice
+    //         );
+    //     }
+    // }
 }

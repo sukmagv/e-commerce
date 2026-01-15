@@ -32,11 +32,11 @@ class UpdateProductDTO
         $dto->photo = $request->file('photo');
         $dto->price = $request->input('price');
         $dto->is_discount = $request->boolean('is_discount');
-        $dto->amount = $request->input('amount');
-        $dto->final_price = $request->input('final_price');
 
-        $inputType = $request->input('type');
-        $dto->type = ($dto->is_discount && $inputType) ? DiscountType::from($inputType) : null;
+        $discount         = $request->input('discount', []);
+        $dto->type        = isset($discount['type']) ? DiscountType::from($discount['type']) : null;
+        $dto->amount      = isset($discount['amount']) ? $discount['amount'] : null;
+        $dto->final_price = isset($discount['final_price']) ? $discount['final_price'] : null;
 
         return $dto;
     }

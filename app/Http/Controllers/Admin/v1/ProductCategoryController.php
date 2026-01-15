@@ -4,57 +4,64 @@ namespace App\Http\Controllers\Admin\v1;
 
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
+use App\Http\Resources\ProductCategoryResource;
 use App\Modules\Product\Models\ProductCategory;
 
 class ProductCategoryController extends Controller
 {
     /**
      * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
      */
     public function index()
     {
-        // return ProductCategoryResource::collection(
-        //     ProductCategory::paginate(10)
-        // );
+        return ProductCategoryResource::collection(ProductCategory::paginate(20));
     }
 
     /**
      * Store a newly created resource in storage.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \App\Http\Resources\ProductCategoryResource
      */
-    public function store(Request $request)
+    public function store(Request $request): ProductCategoryResource
     {
-        //
+        $vallidatedData = $request->validate([
+            'name' => 'required|string|max:255',
+        ]);
+
+        $productCategory = ProductCategory::create($vallidatedData);
+
+        return new ProductCategoryResource($productCategory);
     }
 
     /**
      * Display the specified resource.
+     *
+     * @param \App\Modules\Product\Models\ProductCategory
+     * @return \App\Http\Resources\ProductCategoryResource
      */
-    public function show(ProductCategory $productCategory)
+    public function show(ProductCategory $productCategory): ProductCategoryResource
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(ProductCategory $productCategory)
-    {
-        //
+        return new ProductCategoryResource($productCategory);
     }
 
     /**
      * Update the specified resource in storage.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @param \App\Modules\Product\Models\ProductCategory
+     * @return \App\Http\Resources\ProductCategoryResource
      */
-    public function update(Request $request, ProductCategory $productCategory)
+    public function update(Request $request, ProductCategory $productCategory): ProductCategoryResource
     {
-        //
-    }
+        $validatedData = $request->validate([
+            'name' => 'required|string|max:255',
+        ]);
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(ProductCategory $productCategory)
-    {
-        //
+        $productCategory->update($validatedData);
+
+        return new ProductCategoryResource($productCategory);
     }
 }

@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Admin\v1;
 
 use Illuminate\Validation\Rule;
+use App\Rules\DiscountValidation;
 use App\Http\Requests\BaseRequest;
 use App\Modules\Product\Enums\DiscountType;
 
@@ -17,13 +18,22 @@ class CreateProductRequest extends BaseRequest
     {
         return [
             'category_id' => ['required', 'exists:product_categories,id'],
-            'name'        => ['required', 'string'],
+            'name'        => ['required', 'string', 'max:100'],
             'photo'       => ['required', 'file', 'max:2048'],
-            'price'       => ['required', 'numeric', 'min:0'],
+            'price'       => ['required', 'numeric', 'min:1'],
             'is_discount' => ['required', 'boolean'],
-            'type'        => ['required_if:is_discount,true,1', 'string', Rule::enum(DiscountType::class)],
-            'amount'      => ['required_if:is_discount,true,1', 'numeric', 'min:0'],
-            'final_price' => ['required_if:is_discount,true,1', 'numeric', 'min:0'],
+
+            'discount' => [
+                'required_if:is_discount,true,1',
+                'array',
+                new DiscountValidation(
+                    $this->input('price'),
+                    $this->boolean('is_discount')
+                ),
+            ],
+            'discount.type'        => ['required_with:discount', 'string', Rule::enum(DiscountType::class)],
+            'discount.amount'      => ['required_with:discount', 'numeric', 'min:1'],
+            'discount.final_price' => ['required_with:discount', 'numeric', 'min:1'],
         ];
     }
 }

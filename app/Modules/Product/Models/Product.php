@@ -2,11 +2,11 @@
 
 namespace App\Modules\Product\Models;
 
+use App\Supports\HasCode;
+use App\Supports\HasSlug;
+use App\Supports\Searchable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Database\Eloquent\Builder;
-use App\Modules\Auth\Models\Traits\HasCode;
-use App\Modules\Auth\Models\Traits\HasSlug;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -16,7 +16,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Product extends Model
 {
-    use HasFactory, HasCode, SoftDeletes, HasSlug;
+    use HasFactory, HasCode, SoftDeletes, HasSlug, Searchable;
 
     protected $fillable = [
         'category_id',
@@ -54,14 +54,6 @@ class Product extends Model
     {
         return Attribute::make(
             get: fn (?string $value) => $value ?? Storage::url($value),
-        );
-    }
-
-    public function scopeSearch(Builder $query, ?string $search): Builder
-    {
-        return $query->when(
-            $search,
-            fn ($q) => $q->where('name', 'like', "%{$search}%")
         );
     }
 }

@@ -25,7 +25,7 @@ class ProductController extends Controller
     public function index(Request $request)
     {
         $products = Product::with('activeDiscount')
-            ->search($request->query('search'))
+            ->search('name', $request->query('search'))
             ->latest()
             ->paginate($request->query('limit', 20));
 
