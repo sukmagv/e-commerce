@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Modules\Auth\Models\Traits;
+namespace App\Supports;
 
 use Illuminate\Support\Carbon;
 

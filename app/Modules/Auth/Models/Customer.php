@@ -2,13 +2,12 @@
 
 namespace App\Modules\Auth\Models;
 
+use App\Supports\HasCode;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Notifications\Notifiable;
-use App\Modules\Auth\Models\Traits\HasCode;
 use App\Modules\Auth\Models\Traits\HasUser;
-use App\Modules\Auth\Models\Traits\HasPhoto;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 

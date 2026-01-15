@@ -2,10 +2,10 @@
 
 namespace App\Modules\Auth\Models;
 
+use App\Supports\HasSlug;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
-use App\Modules\Auth\Models\Traits\HasSlug;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Role extends Model
