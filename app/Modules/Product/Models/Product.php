@@ -3,8 +3,8 @@
 namespace App\Modules\Product\Models;
 
 use App\Supports\HasCode;
+use App\Supports\HasSearch;
 use App\Supports\HasSlug;
-use App\Supports\Searchable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -16,7 +16,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Product extends Model
 {
-    use HasFactory, HasCode, SoftDeletes, HasSlug, Searchable;
+    use HasFactory, HasCode, SoftDeletes, HasSlug, HasSearch;
 
     protected $fillable = [
         'category_id',
@@ -40,7 +40,7 @@ class Product extends Model
         return $this->belongsTo(ProductCategory::class);
     }
 
-    public function productDiscounts(): HasMany
+    public function discounts(): HasMany
     {
         return $this->hasMany(ProductDiscount::class);
     }

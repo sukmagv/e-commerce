@@ -7,8 +7,8 @@ use InvalidArgumentException;
 use Illuminate\Support\Facades\DB;
 use App\Modules\Product\Models\Product;
 use App\Modules\Product\DTOs\CreateProductDTO;
-use App\Modules\Product\Enums\DiscountType;
 use App\Modules\Product\Models\ProductDiscount;
+use App\Supports\DiscountValidation;
 
 class CreateProductAction
 {
@@ -42,6 +42,13 @@ class CreateProductAction
             $product->save();
 
             if ($dto->is_discount) {
+                $finalPrice = DiscountValidation::calculateFinalPrice(
+                    $dto->price,
+                    $dto->type,
+                    $dto->amount,
+                    $dto->final_price,
+                );
+
                 $discount = new ProductDiscount([
                     'type'        => $dto->type,
                     'amount'      => $dto->amount,
@@ -49,6 +56,7 @@ class CreateProductAction
                 ]);
 
                 $discount->product()->associate($product);
+                
                 $discount->save();
             }
 

@@ -23,14 +23,7 @@ class CreateProductRequest extends BaseRequest
             'price'       => ['required', 'numeric', 'min:1'],
             'is_discount' => ['required', 'boolean'],
 
-            'discount' => [
-                'required_if:is_discount,true,1',
-                'array',
-                new DiscountValidation(
-                    $this->input('price'),
-                    $this->boolean('is_discount')
-                ),
-            ],
+            'discount'             => ['required_if:is_discount,true,1','array'],
             'discount.type'        => ['required_with:discount', 'string', Rule::enum(DiscountType::class)],
             'discount.amount'      => ['required_with:discount', 'numeric', 'min:1'],
             'discount.final_price' => ['required_with:discount', 'numeric', 'min:1'],

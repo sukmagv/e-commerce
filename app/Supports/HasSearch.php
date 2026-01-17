@@ -4,7 +4,7 @@ namespace App\Supports;
 
 use Illuminate\Database\Eloquent\Builder;
 
-trait Searchable
+trait HasSearch
 {
     public function scopeSearch(Builder $query, string $column = 'name', ?string $search): Builder
     {
