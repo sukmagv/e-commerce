@@ -23,14 +23,7 @@ class UpdateProductRequest extends BaseRequest
             'price'       => ['required_with:discount', 'integer'],
             'is_discount' => ['required_with:discount', 'boolean'],
 
-            'discount' => [
-                'sometimes',
-                'array',
-                new DiscountValidation(
-                    $this->input('price'),
-                    $this->boolean('is_discount')
-                ),
-            ],
+            'discount'             => ['required_if:is_discount,true,1','array'],
             'discount.type'        => ['required_with_all:discount.amount,discount.final_price', 'string', Rule::enum(DiscountType::class)],
             'discount.amount'      => ['required_with_all:discount.type,discount.final_price', 'numeric', 'min:1'],
             'discount.final_price' => ['required_with_all:discount.type,discount.amount', 'numeric', 'min:1'],

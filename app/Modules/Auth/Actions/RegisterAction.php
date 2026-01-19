@@ -53,7 +53,7 @@ class RegisterAction
             DB::rollBack();
 
             if ($path) {
-                $this->fileService->delete($path);
+                $this->fileService->delete($path, 'profile');
             }
 
             throw $e;

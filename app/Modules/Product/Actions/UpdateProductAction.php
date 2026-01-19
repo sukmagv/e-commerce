@@ -4,6 +4,7 @@ namespace App\Modules\Product\Actions;
 
 use App\Services\FileService;
 use Illuminate\Support\Facades\DB;
+use App\Supports\DiscountValidation;
 use App\Modules\Product\Models\Product;
 use App\Modules\Product\DTOs\UpdateProductDTO;
 use App\Modules\Product\Models\ProductDiscount;
@@ -43,7 +44,14 @@ class UpdateProductAction
 
             $product->update($newProductData);
 
-            if ($dto->type && $dto->amount !== null && $dto->final_price !== null) {
+            if ($dto->is_discount) {
+                DiscountValidation::calculateFinalPrice(
+                    $dto->price,
+                    $dto->type,
+                    $dto->amount,
+                    $dto->final_price,
+                );
+
                 $discount = new ProductDiscount([
                     'type'        => $dto->type,
                     'amount'      => $dto->amount,
@@ -51,6 +59,7 @@ class UpdateProductAction
                 ]);
 
                 $discount->product()->associate($product);
+
                 $discount->save();
             }
 
@@ -63,7 +72,7 @@ class UpdateProductAction
             DB::rollBack();
 
             if ($path) {
-                $this->fileService->delete($path);
+                $this->fileService->delete($path, 'product');
             }
 
             throw $e;

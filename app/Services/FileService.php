@@ -16,19 +16,21 @@ class FileService
      * @param string $disk
      * @return string|null
      */
-    public function updateOrCreate(?UploadedFile $file, ?string $oldPath = null, string $folder = 'uploads', string $disk = 'public'): ?string
+    public function updateOrCreate(?UploadedFile $file, ?string $oldFilename = null, string $folder = 'uploads', string $disk = 'public'): ?string
     {
         if (!$file) {
-            return $oldPath;
+            return $oldFilename;
         }
 
-        $newPath = $file->store($folder, $disk);
+        $filename = $file->hashName();
 
-        if ($newPath && $oldPath) {
-            $this->delete($oldPath, $disk);
+        $file->storeAs($folder, $filename, $disk);
+
+        if ($oldFilename) {
+            $this->delete($oldFilename, $folder, $disk);
         }
 
-        return $newPath;
+        return $filename;
     }
 
     /**
@@ -38,9 +40,11 @@ class FileService
      * @param string $disk
      * @return void
      */
-    public function delete(string $path, string $disk = 'public'): void
+    public function delete(string $filename, string $folder, string $disk = 'public'): void
     {
-        if ($path && Storage::disk($disk)->exists($path)) {
+        $path = $folder . '/' . $filename;
+
+        if (Storage::disk($disk)->exists($path)) {
             Storage::disk($disk)->delete($path);
         }
     }

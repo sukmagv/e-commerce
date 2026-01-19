@@ -42,7 +42,7 @@ class CreateProductAction
             $product->save();
 
             if ($dto->is_discount) {
-                $finalPrice = DiscountValidation::calculateFinalPrice(
+                DiscountValidation::calculateFinalPrice(
                     $dto->price,
                     $dto->type,
                     $dto->amount,
@@ -56,7 +56,7 @@ class CreateProductAction
                 ]);
 
                 $discount->product()->associate($product);
-                
+
                 $discount->save();
             }
 
@@ -66,7 +66,7 @@ class CreateProductAction
             DB::rollBack();
 
             if ($path) {
-                $this->fileService->delete($path);
+                $this->fileService->delete($path, 'product');
             }
 
             throw $e;

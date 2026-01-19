@@ -18,6 +18,9 @@ class Product extends Model
 {
     use HasFactory, HasCode, SoftDeletes, HasSlug, HasSearch;
 
+    /** @var string */
+    const IMAGE_PATH = 'product/';
+
     protected $fillable = [
         'category_id',
         'code',
@@ -53,7 +56,8 @@ class Product extends Model
     protected function photo(): Attribute
     {
         return Attribute::make(
-            get: fn (?string $value) => $value ?? Storage::url($value),
-        );
+            get: fn (?string $value) =>
+                $value ?? Storage::url(self::IMAGE_PATH . $value)
+            );
     }
 }
