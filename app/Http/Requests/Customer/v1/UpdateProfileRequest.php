@@ -2,8 +2,7 @@
 
 namespace App\Http\Requests\Customer\v1;
 
-use Illuminate\Validation\Rule;
-use App\Http\Requests\BaseRequest;
+use App\Supports\BaseRequest;
 
 class UpdateProfileRequest extends BaseRequest
 {

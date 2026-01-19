@@ -4,7 +4,7 @@ namespace App\Http\Requests\Admin\v1;
 
 use Illuminate\Validation\Rule;
 use App\Rules\DiscountValidation;
-use App\Http\Requests\BaseRequest;
+use App\Supports\BaseRequest;
 use App\Modules\Product\Enums\DiscountType;
 
 class CreateProductRequest extends BaseRequest

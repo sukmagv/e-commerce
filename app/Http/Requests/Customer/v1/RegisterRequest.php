@@ -3,8 +3,7 @@
 namespace App\Http\Requests\Customer\v1;
 
 use App\Rules\VerifiedOtp;
-use Illuminate\Validation\Rule;
-use App\Http\Requests\BaseRequest;
+use App\Supports\BaseRequest;
 
 class RegisterRequest extends BaseRequest
 {

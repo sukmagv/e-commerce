@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests\Customer\v1;
 
-use App\Http\Requests\BaseRequest;
+use App\Supports\BaseRequest;
 
 class ForgotPasswordRequest extends BaseRequest
 {
