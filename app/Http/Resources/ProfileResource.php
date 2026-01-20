@@ -16,14 +16,12 @@ class ProfileResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id' => $this->id,
-            'name' => $this->name,
+            'id'    => $this->id,
+            'name'  => $this->name,
             'email' => $this->email,
             'phone' => $this->customer?->phone,
-            'photo' => $this->customer && $this->customer->photo
-                ? Storage::url($this->customer->photo)
-                : null,
-            'role' => [
+            'photo' => $this->customer?->photo,
+            'role'  => [
                 'slug' => $this->role->slug,
                 'name' => $this->role->name,
             ],

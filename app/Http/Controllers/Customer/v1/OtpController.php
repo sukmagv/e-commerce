@@ -1,21 +1,21 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Customer\v1;
 
-use App\Http\Requests\OtpRequest;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use App\Http\Controllers\Controller;
+use App\Http\Requests\Customer\v1\OtpRequest;
+use App\Modules\Auth\DTOs\SendOtpDTO;
 use App\Modules\Auth\Actions\SendOtpAction;
 use App\Modules\Auth\Actions\VerifyOtpAction;
-use App\Modules\Auth\DTOs\SendOtpDTO;
-use Symfony\Component\HttpFoundation\Response;
 
 class OtpController extends Controller
 {
     /**
      * Generate and Send OTP to customer
      *
-     * @param \App\Http\Requests\OtpRequest $request
+     * @param \App\Http\Requests\Customer\v1\OtpRequest $request
      * @param \App\Modules\Auth\Actions\SendOtpAction $action
      * @return JsonResponse
      */

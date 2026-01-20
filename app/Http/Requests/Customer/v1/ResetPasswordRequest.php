@@ -1,10 +1,11 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Customer\v1;
 
+use App\Rules\VerifiedOtp;
 use App\Http\Requests\BaseRequest;
 
-class LoginRequest extends BaseRequest
+class ResetPasswordRequest extends BaseRequest
 {
     /**
      * Get the validation rules that apply to the request.
@@ -14,8 +15,8 @@ class LoginRequest extends BaseRequest
     public function rules(): array
     {
         return [
-            'email' => ['required', 'email', 'exists:users,email'],
-            'password' => ['required', 'string', 'min:6'],
+            'otp_id' => ['required', 'exists:otps,id', new VerifiedOtp],
+            'password' => ['required', 'string', 'min:6', 'confirmed'],
         ];
     }
 }

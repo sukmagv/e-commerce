@@ -2,17 +2,18 @@
 
 namespace App\Modules\Auth\Models;
 
+use App\Supports\HasCode;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Notifications\Notifiable;
-use App\Modules\Auth\Models\Traits\HasCode;
-use App\Modules\Auth\Models\Traits\HasPhoto;
 use App\Modules\Auth\Models\Traits\HasUser;
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Customer extends Model
 {
-    use HasApiTokens, HasFactory, Notifiable, HasUser, HasCode, HasPhoto;
+    use HasApiTokens, HasFactory, Notifiable, HasUser, HasCode;
 
     protected $fillable = [
         'user_id',
@@ -23,7 +24,13 @@ class Customer extends Model
     ];
 
     protected $casts = [
-        'code' => 'string',
         'is_blocked' => 'boolean'
     ];
+
+    protected function photo(): Attribute
+    {
+        return Attribute::make(
+            get: fn (?string $value) => $value ? Storage::url($value) : null,
+        );
+    }
 }

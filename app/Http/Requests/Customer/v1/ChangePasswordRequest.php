@@ -1,9 +1,8 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Customer\v1;
 
-use App\Rules\VerifiedOtp;
-use Illuminate\Foundation\Http\FormRequest;
+use App\Http\Requests\BaseRequest;
 
 class ChangePasswordRequest extends BaseRequest
 {

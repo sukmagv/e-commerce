@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Modules\Auth\Models\Traits;
+namespace App\Supports;
 
 use Illuminate\Support\Carbon;
 
@@ -10,6 +10,9 @@ trait HasCode
     {
         return [
             'Customer' => 'CUS',
+            'ProductCategory' => 'PCA',
+            'Product' => 'PRD',
+            'Order' => 'ORD',
         ];
     }
 
