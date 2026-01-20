@@ -6,6 +6,11 @@ use Illuminate\Support\Carbon;
 
 trait HasCode
 {
+    /**
+     * Prefix for code by models
+     *
+     * @return array
+     */
     protected static function codePrefixes(): array
     {
         return [
@@ -16,6 +21,11 @@ trait HasCode
         ];
     }
 
+    /**
+     * Boot generate data method
+     *
+     * @return void
+     */
     protected static function bootHasCode()
     {
         static::creating(function ($model) {
@@ -30,6 +40,12 @@ trait HasCode
         });
     }
 
+    /**
+     * Generate data based on model prefix and date
+     *
+     * @param string $prefix
+     * @return string
+     */
     protected static function generateCode(string $prefix): string
     {
         $date = Carbon::now()->format('Ymd');

@@ -60,6 +60,11 @@ class Product extends Model
         return $this->hasMany(OrderItem::class);
     }
 
+    /**
+     * Accessor for the `photo` attribute.
+     *
+     * @return \Illuminate\Database\Eloquent\Casts\Attribute
+     */
     protected function photo(): Attribute
     {
         return Attribute::make(
@@ -68,6 +73,12 @@ class Product extends Model
             );
     }
 
+    /**
+     * Get product data with active status
+     *
+     * @param \Illuminate\Database\Eloquent\Builder $query
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
     public function scopeActive(Builder $query): Builder
     {
         return $query->where('is_active', true);

@@ -6,6 +6,11 @@ use Illuminate\Support\Str;
 
 trait HasSlug
 {
+    /**
+     * Boot slug generator
+     *
+     * @return void
+     */
     protected static function bootHasSlug()
     {
         static::saving(function ($model) {
@@ -15,7 +20,14 @@ trait HasSlug
         });
     }
 
-    protected static function uniqueSlug(string $value, $ignoreId = null): string
+    /**
+     * Generate slug based on data name
+     *
+     * @param string $value
+     * @param mixed $ignoreId
+     * @return string
+     */
+    protected static function uniqueSlug(string $value, mixed $ignoreId = null): string
     {
         $slug = Str::slug($value);
         $original = $slug;

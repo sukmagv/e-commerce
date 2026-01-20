@@ -2,12 +2,20 @@
 
 namespace App\Supports;
 
-use InvalidArgumentException;
 use App\Modules\Product\Enums\DiscountType;
 use Illuminate\Validation\ValidationException;
 
 class DiscountValidation
 {
+    /**
+     * Validate input price with calculated price from database
+     *
+     * @param float $price
+     * @param \App\Modules\Product\Enums\DiscountType $type
+     * @param float $amount
+     * @param float $finalPrice
+     * @return integer
+     */
     public static function calculateFinalPrice(float $price, DiscountType $type, float $amount, float $finalPrice): int
     {
         $expectedFinalPrice = match ($type) {
