@@ -16,8 +16,9 @@ class UpdateProductAction
 
     /**
      * Update product data
+     * Soft delete product if product exists in order table and create new product
      *
-     * @param
+     * @param \App\Modules\Product\DTOs\UpdateProductDTO $dto
      * @param \App\Modules\Product\Models\Product $product
      * @return \App\Modules\Product\Models\Product Product
      */
@@ -27,44 +28,56 @@ class UpdateProductAction
 
         DB::beginTransaction();
         try {
-            // soft delete product ketika product sudah pernah diorder, update biasa ketika belum pernah masuk ke order
+            // cek apakah product sudah dipakai di order
+            $isUsedInOrder = $product->orderItems()->exists();
 
             $oldPath = $product->photo;
 
-            $newProductData = [
-                'name'        => $dto->name ?? $product->name,
-                'category_id' => $dto->category_id ?? $product->category_id,
-                'price'       => $dto->price ?? $product->price,
-                'is_discount' => $dto->is_discount ?? $product->is_discount,
-            ];
+            if ($isUsedInOrder) {
+                $newProduct = $product->replicate([
+                    'code',
+                    'slug',
+                    'deleted_at',
+                    'created_at',
+                    'updated_at',
+                ]);
 
-            if ($dto->photo) {
-                $newProductData['photo'] = $this->fileService->updateOrCreate($dto->photo, $oldPath, 'products');
+                if (isset($dto->photo) && $dto->photo) {
+                    $newProduct->photo = $this->fileService->updateOrCreate($dto->photo, null, 'products');
+                } else {
+                    $newProduct->photo = $oldPath;
+                }
+
+                $newProduct->fill($dto->toArray());
+
+                $newProduct->save();
+
+                $product->delete();
+
+            } else {
+                $updateData = $dto->toArray();
+
+                if (isset($dto->photo) && $dto->photo) {
+                    $updateData['photo'] = $this->fileService->updateOrCreate($dto->photo, $oldPath, 'products');
+                }
+
+                $product->update($updateData);
             }
 
-            $product->update($newProductData);
-
-            if ($dto->is_discount) {
+            if (isset($dto->is_discount) && $dto->is_discount) {
                 DiscountValidation::calculateFinalPrice(
                     $dto->price,
-                    $dto->type,
-                    $dto->amount,
-                    $dto->final_price,
+                    $dto->discount->type,
+                    $dto->discount->amount,
+                    $dto->discount->final_price,
                 );
 
-                $discount = new ProductDiscount([
-                    'type'        => $dto->type,
-                    'amount'      => $dto->amount,
-                    'final_price' => $dto->final_price,
-                ]);
+                $discount = new ProductDiscount($dto->discount->toArray());
 
                 $discount->product()->associate($product);
 
                 $discount->save();
             }
-
-            // discount lama di soft delete jika sudah pernah diorder atau ada perubahan product price
-            // update biasa jika belum ada di order
 
             DB::commit();
 

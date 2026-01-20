@@ -8,6 +8,7 @@ use App\Modules\Product\Models\Product;
 use App\Http\Resources\ProductResource;
 use App\Http\Requests\Admin\v1\CreateProductRequest;
 use App\Http\Requests\Admin\v1\UpdateProductRequest;
+use App\Http\Requests\QueryParamRequest;
 use App\Modules\Product\Actions\CreateProductAction;
 use App\Modules\Product\Actions\UpdateProductAction;
 use App\Modules\Product\DTOs\CreateProductDTO;
@@ -22,12 +23,12 @@ class ProductController extends Controller
      * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
      */
-    public function index(Request $request)
+    public function index(QueryParamRequest $request)
     {
         $products = Product::with('activeDiscount')
-            ->search('name', $request->query('search'))
+            ->search($request->search)
             ->latest()
-            ->paginate($request->query('limit', 20));
+            ->paginate($request->limit ?? 20);
 
         return ProductResource::collection($products);
     }

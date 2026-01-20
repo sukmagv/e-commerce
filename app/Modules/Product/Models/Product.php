@@ -3,10 +3,12 @@
 namespace App\Modules\Product\Models;
 
 use App\Supports\HasCode;
-use App\Supports\HasSearch;
 use App\Supports\HasSlug;
+use App\Supports\HasSearch;
+use App\Modules\Order\Models\OrderItem;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -53,11 +55,21 @@ class Product extends Model
         return $this->hasOne(ProductDiscount::class)->latest();
     }
 
+    public function orderItems(): HasMany
+    {
+        return $this->hasMany(OrderItem::class);
+    }
+
     protected function photo(): Attribute
     {
         return Attribute::make(
             get: fn (?string $value) =>
                 $value ?? Storage::url(self::IMAGE_PATH . $value)
             );
+    }
+
+    public function scopeActive(Builder $query): Builder
+    {
+        return $query->where('is_active', true);
     }
 }

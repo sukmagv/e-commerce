@@ -27,12 +27,7 @@ class CreateProductAction
 
         DB::beginTransaction();
         try {
-            $product = new Product([
-                'category_id' => $dto->category_id,
-                'name' => $dto->name,
-                'price' => $dto->price,
-                'is_discount' => $dto->is_discount,
-            ]);
+            $product = new Product($dto->toArray());
 
             if ($dto->photo) {
                 $path = $this->fileService->updateOrCreate($dto->photo, null, 'products');
@@ -44,16 +39,12 @@ class CreateProductAction
             if ($dto->is_discount) {
                 DiscountValidation::calculateFinalPrice(
                     $dto->price,
-                    $dto->type,
-                    $dto->amount,
-                    $dto->final_price,
+                    $dto->discount->type,
+                    $dto->discount->amount,
+                    $dto->discount->final_price,
                 );
 
-                $discount = new ProductDiscount([
-                    'type'        => $dto->type,
-                    'amount'      => $dto->amount,
-                    'final_price' => $dto->final_price,
-                ]);
+                $discount = new ProductDiscount($dto->discount->toArray());
 
                 $discount->product()->associate($product);
 
@@ -74,38 +65,4 @@ class CreateProductAction
 
         return $product;
     }
-
-    /**
-     * Validate discount final price calculation
-     *
-     * @param \App\Modules\Product\DTOs\CreateProductDTO $dto
-     * @return void
-     */
-    // protected function validateDiscountCalculation(CreateProductDTO $dto): void
-    // {
-    //     if (!$dto->is_discount) {
-    //         return;
-    //     }
-
-    //     $expectedFinalPrice = match ($dto->type) {
-    //         DiscountType::NOMINAL => $dto->price - $dto->amount,
-
-    //         DiscountType::PERCENTAGE => $dto->price - ($dto->price * $dto->amount / 100),
-
-    //         default => $dto->price,
-    //     };
-
-    //     // pengecekan untuk mencegah harga barang negatif setelah diberi diskon
-    //     if ($expectedFinalPrice < 0) {
-    //         throw new InvalidArgumentException(
-    //             "The discount amount exceeds the product price."
-    //         );
-    //     }
-
-    //     if (round($expectedFinalPrice) !== round($dto->final_price)) {
-    //         throw new InvalidArgumentException(
-    //             "The final price calculation is not valid. Expected price = " . $expectedFinalPrice
-    //         );
-    //     }
-    // }
 }

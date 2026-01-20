@@ -12,9 +12,7 @@ class CreateProductDTO extends BaseDTO
     public int $category_id;
     public string $name;
     public UploadedFile $photo;
-    public int $price;
+    public float $price;
     public bool $is_discount;
-    public ?DiscountType $type;
-    public ?int $amount;
-    public ?int $final_price;
+    public ?DiscountDTO $discount;
 }
