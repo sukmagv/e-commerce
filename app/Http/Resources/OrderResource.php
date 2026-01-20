@@ -15,17 +15,17 @@ class OrderResource extends JsonResource
     public function toArray(Request $request): array
     {
         return [
-            'id'         => $this->id,
-            'code'       => $this->code,
-            'username' => $this->user->name,
-            'sub_total' => $this->sub_total,
-            'tax_amount' => $this->tax_amount,
+            'id'          => $this->id,
+            'code'        => $this->code,
+            'username'    => $this->user->name,
+            'sub_total'   => $this->sub_total,
+            'tax_amount'  => $this->tax_amount,
             'grand_total' => $this->grand_total,
-            'status'     => $this->status,
-            'proof_link' => $this->payment?->latestProof->proof_link,
-            'updated_at' => $this->created_at,
+            'status'      => $this->status,
+            'proof_link'  => $this->payment?->latestProof->proof_link,
+            'updated_at'  => $this->created_at,
 
-            'items' => OrderDetailResource::collection($this->whenLoaded('orderItems')),
+            'item' => OrderDetailResource::make($this->whenLoaded('orderItem')),
         ];
     }
 }

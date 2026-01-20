@@ -6,6 +6,7 @@ use App\Services\FileService;
 use Illuminate\Support\Facades\DB;
 use App\Modules\Order\Models\Order;
 use App\Modules\Order\Models\Payment;
+use App\Modules\Order\Enums\OrderStatus;
 use App\Modules\Order\Enums\PaymentStatus;
 use App\Modules\Order\Models\PaymentProof;
 use App\Modules\Order\DTOs\UploadPaymentProofDTO;
@@ -41,6 +42,10 @@ class UploadPaymentProofAction
             $paymentProof->payment()->associate($payment);
 
             $paymentProof->save();
+
+            $order->update([
+                'status' => OrderStatus::IN_PROGRESS,
+            ]);
 
             DB::commit();
 

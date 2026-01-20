@@ -62,6 +62,13 @@ class CreateOrderAction
         return $order;
     }
 
+    /**
+     * Validate all product and discount price
+     *
+     * @param \App\Modules\Order\DTOs\CreateOrderDTO $dto
+     * @param \App\Modules\Product\Models\Product $product
+     * @return void
+     */
     protected function validateProductPrice(CreateOrderDTO $dto, Product $product): void
     {
         if ($dto->item->normal_price != $product->price) {
@@ -98,6 +105,12 @@ class CreateOrderAction
         }
     }
 
+    /**
+     * Validate sub total, tax amount and grand total order
+     *
+     * @param \App\Modules\Order\DTOs\CreateOrderDTO $dto
+     * @return void
+     */
     protected function validateOrderPrice(CreateOrderDTO $dto): void
     {
         $taxAmount = ($dto->item->final_price * 11) / 100; // bikin const di model

@@ -26,12 +26,13 @@ class UpdateProductAction
     {
         $path = null;
 
+        // cek apakah product sudah dipakai di order
+        $isUsedInOrder = $product->orderItems()->exists(); // revisi
+
+        $oldPath = $product->photo;
+
         DB::beginTransaction();
         try {
-            // cek apakah product sudah dipakai di order
-            $isUsedInOrder = $product->orderItems()->exists();
-
-            $oldPath = $product->photo;
 
             if ($isUsedInOrder) {
                 $newProduct = $product->replicate([

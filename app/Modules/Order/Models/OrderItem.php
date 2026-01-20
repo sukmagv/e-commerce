@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class OrderItem extends Model
 {
@@ -32,23 +33,18 @@ class OrderItem extends Model
         'final_price' => 'integer',
     ];
 
-    public function product(): BelongsTo
-    {
-        return $this->belongsTo(Product::class);
-    }
-
-    public function productDiscount(): HasOne
-    {
-        return $this->hasOne(ProductDiscount::class);
-    }
-
     public function order(): BelongsTo
     {
         return $this->belongsTo(ProductDiscount::class);
     }
 
+    public function product(): BelongsTo
+    {
+        return $this->belongsTo(Product::class)->withTrashed();
+    }
+
     public function discount(): BelongsTo
     {
-        return $this->belongsTo(ProductDiscount::class);
+        return $this->belongsTo(ProductDiscount::class)->withTrashed();
     }
 }

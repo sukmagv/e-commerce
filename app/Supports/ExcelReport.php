@@ -12,8 +12,8 @@ class ExcelReport implements FromCollection, WithHeadings
     protected array $headings;
 
     /**
-     * @param iterable|Collection $data       Collection of models or arrays
-     * @param array $headings                Column headings
+     * @param iterable|Collection $data
+     * @param array $headings
      */
     public function __construct(iterable $data, array $headings)
     {

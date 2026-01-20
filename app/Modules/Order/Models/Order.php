@@ -17,7 +17,7 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Order extends Model
 {
-    use HasFactory, HasCode, HasSearch, SoftDeletes;
+    use HasFactory, HasCode, HasSearch;
 
     protected $fillable = [
         'user_id',
@@ -43,9 +43,9 @@ class Order extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function orderItems(): HasMany
+    public function orderItem(): HasOne
     {
-        return $this->hasMany(OrderItem::class);
+        return $this->hasOne(OrderItem::class);
     }
 
     public function payment(): HasOne

@@ -3,6 +3,7 @@
 namespace App\Supports;
 
 use Illuminate\Support\Carbon;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 trait HasCode
 {
@@ -50,23 +51,31 @@ trait HasCode
     {
         $date = Carbon::now()->format('Ymd');
 
-        // Get last record today
-        $last = static::withTrashed()
+        $query = static::query();
+
+        // pakai withTrashed jika model pakai SoftDeletes
+        if (in_array(SoftDeletes::class, class_uses_recursive(static::class))) {
+            $query->withTrashed();
+        }
+
+        $last = $query
             ->whereDate('created_at', Carbon::today())
+            ->where('code', 'like', $prefix . '-%')
             ->latest('id')
             ->first();
 
         $lastNumber = 0;
 
-        if ($last && $last->code) {
+        if ($last?->code) {
             $parts = explode('-', $last->code);
-            if (isset($parts[1])) {
-                $lastNumber = (int) $parts[1];
-            }
+            $lastNumber = (int) ($parts[1] ?? 0);
         }
 
-        $nextNumber = $lastNumber + 1;
-
-        return sprintf('%s-%03d-%s', $prefix, $nextNumber, $date);
+        return sprintf(
+            '%s-%03d-%s',
+            $prefix,
+            $lastNumber + 1,
+            $date
+        );
     }
 }

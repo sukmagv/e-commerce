@@ -2,14 +2,15 @@
 
 namespace App\Http\Controllers\Admin\v1;
 
+use Illuminate\Http\Request;
 use App\Supports\ExcelReport;
+use Illuminate\Validation\Rule;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 use App\Modules\Order\Models\Order;
 use App\Http\Controllers\Controller;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Http\Resources\OrderResource;
-use App\Http\Requests\QueryParamRequest;
 use App\Modules\Order\Enums\OrderStatus;
 use App\Modules\Order\Enums\PaymentStatus;
 use Symfony\Component\HttpFoundation\Response;
@@ -22,13 +23,18 @@ class OrderController extends Controller
      *
      * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
      */
-    public function index(QueryParamRequest $request)
+    public function index(Request $request)
     {
+        $request->validate([
+            'search'     => ['sometimes', 'string'],
+            'status'     => ['sometimes', 'string', Rule::enum(OrderStatus::class)],
+        ]);
+
         $orders = Order::with(['user', 'payment.latestProof'])
-            ->search($request->search)
-            ->status($request->status)
+            ->search($request->query('search'))
+            ->status($request->query('status'))
             ->latest()
-            ->paginate($request->limit ?? 20);
+            ->paginate($request->query('limit', 10));
 
         return OrderResource::collection($orders);
     }
@@ -42,14 +48,10 @@ class OrderController extends Controller
     public function show(Order $order): OrderResource
     {
         $order->loadMissing([
-            'user',
+            'user:id,name',
             'payment.latestProof',
-            'orderItems' => function ($q) {
-                $q->with([
-                    'product' => fn ($q) => $q->withTrashed(),
-                    'discount' => fn ($q) => $q->withTrashed(),
-                ]);
-            },
+            'orderItem.product',
+            'orderItem.discount',
         ]);
 
         return new OrderResource($order);
@@ -94,7 +96,7 @@ class OrderController extends Controller
             ]);
 
             $order->update([
-                'status' => OrderStatus::IN_PROGRESS,
+                'status' => OrderStatus::FINISHED,
             ]);
         });
 
@@ -119,6 +121,10 @@ class OrderController extends Controller
             $order->payment->latestProof->update([
                 'status' => PaymentStatus::DECLINED,
             ]);
+
+            $order->update([
+                'status' => OrderStatus::DECLINED,
+            ]);
         });
 
         return new JsonResponse();
@@ -131,15 +137,13 @@ class OrderController extends Controller
      */
     public function excelReport()
     {
+        // filter status dan range date
+
         $orders = Order::with([
             'user',
             'payment.latestProof',
-            'orderItems' => function ($q) {
-                $q->with([
-                    'product' => fn ($q) => $q->withTrashed(),
-                    'discount' => fn ($q) => $q->withTrashed(),
-                ]);
-            },
+            'orderItem.product',
+            'orderItem.discount',
         ])
         ->get()
         ->map(fn($order) => [
