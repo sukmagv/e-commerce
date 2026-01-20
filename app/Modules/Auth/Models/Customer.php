@@ -32,11 +32,6 @@ class Customer extends Model
         'is_blocked' => 'boolean'
     ];
 
-    public function orders(): HasMany
-    {
-        return $this->hasMany(Order::class);
-    }
-
     protected function photo(): Attribute
     {
         return Attribute::make(
