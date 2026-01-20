@@ -5,8 +5,8 @@ namespace App\Modules\Auth\DTOs;
 use App\Supports\BaseDTO;
 use Illuminate\Http\Request;
 
-class ResetPasswordDTO extends BaseDTO
+class LoginDTO extends BaseDTO
 {
-    public int $otp_id;
+    public string $email;
     public string $password;
 }

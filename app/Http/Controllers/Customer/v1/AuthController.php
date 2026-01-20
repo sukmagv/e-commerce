@@ -4,20 +4,21 @@ namespace App\Http\Controllers\Customer\v1;
 
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
+use App\Modules\Auth\DTOs\LoginDTO;
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Customer\v1\LoginRequest;
-use App\Http\Requests\Customer\v1\RegisterRequest;
-use App\Modules\Auth\Actions\LoginAction;
+use App\Modules\Auth\Models\Customer;
 use App\Http\Resources\CustomerResource;
-use App\Modules\Auth\DTOs\CustomerLoginDTO;
+use App\Modules\Auth\Actions\LoginAction;
 use App\Modules\Auth\DTOs\ResetPasswordDTO;
 use App\Modules\Auth\Actions\RegisterAction;
 use App\Modules\Auth\DTOs\ForgotPasswordDTO;
-use App\Http\Requests\Customer\v1\ResetPasswordRequest;
 use App\Modules\Auth\DTOs\CustomerRegisterDTO;
-use App\Http\Requests\Customer\v1\ForgotPasswordRequest;
+use App\Http\Requests\Customer\v1\LoginRequest;
 use App\Modules\Auth\Actions\ResetPasswordAction;
+use App\Http\Requests\Customer\v1\RegisterRequest;
 use App\Modules\Auth\Actions\ForgotPasswordAction;
+use App\Http\Requests\Customer\v1\ResetPasswordRequest;
+use App\Http\Requests\Customer\v1\ForgotPasswordRequest;
 
 class AuthController extends Controller
 {
@@ -46,9 +47,17 @@ class AuthController extends Controller
      */
     public function login(LoginRequest $request, LoginAction $action): CustomerResource
     {
-        $dto = CustomerLoginDTO::fromRequest($request);
+        $dto = LoginDTO::fromRequest($request);
 
-        return new CustomerResource($action->execute($dto));
+        $user = $action->execute($dto);
+
+        $customer = Customer::query()
+            ->where('user_id', $user->id)
+            ->first();
+
+        $customer->token = $user->token;
+
+        return new CustomerResource($customer);
     }
 
     /**

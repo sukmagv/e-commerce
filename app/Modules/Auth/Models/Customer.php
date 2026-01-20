@@ -32,16 +32,16 @@ class Customer extends Model
         'is_blocked' => 'boolean'
     ];
 
+    public function orders(): HasMany
+    {
+        return $this->hasMany(Order::class);
+    }
+
     protected function photo(): Attribute
     {
         return Attribute::make(
             get: fn (?string $value) =>
                 $value ?? Storage::url(self::IMAGE_PATH . $value)
             );
-    }
-
-    public function orders(): HasMany
-    {
-        return $this->hasMany(Order::class);
     }
 }
