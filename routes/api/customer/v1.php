@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Customer\v1\OtpController;
 use App\Http\Controllers\Customer\v1\AuthController;
+use App\Http\Controllers\Customer\v1\OrderController;
 use App\Http\Controllers\Customer\v1\ProductController;
 use App\Http\Controllers\Customer\v1\ProfileController;
 
@@ -28,5 +29,13 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::post('/profile', 'changePassword');
         });
     });
+
     Route::resource('products', ProductController::class)->only(['index', 'show']);
+
+    Route::resource('orders', OrderController::class);
+    
+    Route::post('orders/{order}/upload-proof', [OrderController::class, 'uploadProof']);
+    Route::post('orders/{order}/pdf', [OrderController::class, 'getPdf']);
+
+    Route::get('/bank-accounts', [OrderController::class, 'getBanks']);
 });

@@ -1,8 +1,10 @@
 <?php
 
+use App\Http\Controllers\Admin\v1\AuthController;
+use App\Http\Controllers\Admin\v1\CustomerController;
+use App\Http\Controllers\Admin\v1\OrderController;
 use App\Http\Controllers\Admin\v1\ProductCategoryController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Customer\v1\AuthController; // masih belum dipisah
 use App\Http\Controllers\Admin\v1\ProductController;
 
 Route::post('/login', [AuthController::class, 'login']);
@@ -10,4 +12,15 @@ Route::post('/login', [AuthController::class, 'login']);
 Route::middleware('auth:sanctum')->group(function () {
     Route::resource('products', ProductController::class);
     Route::resource('product-categories', ProductCategoryController::class);
+
+    Route::resource('orders', OrderController::class);
+    
+    Route::get('/orders/{order}/proof', [OrderController::class, 'getProofDetail']);
+    Route::patch('/orders/{order}/confirm', [OrderController::class, 'acceptProof']);
+    Route::patch('/orders/{order}/decline', [OrderController::class, 'declineProof']);
+    Route::post('/orders/excel-repot', [OrderController::class, 'excelReport']);
+
+    Route::get('/customers', [CustomerController::class, 'index']);
+    Route::patch('/customers/{customer}/block', [CustomerController::class, 'block']);
+    Route::patch('/customers/{customer}/unblock', [CustomerController::class, 'unblock']);
 });
