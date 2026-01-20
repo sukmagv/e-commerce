@@ -19,9 +19,12 @@ trait HasCode
     protected static function bootHasCode()
     {
         static::creating(function ($model) {
-            $modelName = class_basename($model);
+            if (!empty($model->code)) {
+                return;
+            }
 
-            $prefix = $model->codePrefixes()[$modelName];
+            $modelName = class_basename($model);
+            $prefix = static::codePrefixes()[$modelName] ?? '';
 
             $model->code = static::generateCode($prefix);
         });
@@ -29,10 +32,25 @@ trait HasCode
 
     protected static function generateCode(string $prefix): string
     {
-        $nextId = (static::max('id') ?? 0) + 1;
-        $nextIdPadded = str_pad($nextId, 3, '0', STR_PAD_LEFT);
         $date = Carbon::now()->format('Ymd');
 
-        return sprintf('%s-%s-%s', $prefix, $nextIdPadded, $date);
+        // Get last record today
+        $last = static::withTrashed()
+            ->whereDate('created_at', Carbon::today())
+            ->latest('id')
+            ->first();
+
+        $lastNumber = 0;
+
+        if ($last && $last->code) {
+            $parts = explode('-', $last->code);
+            if (isset($parts[1])) {
+                $lastNumber = (int) $parts[1];
+            }
+        }
+
+        $nextNumber = $lastNumber + 1;
+
+        return sprintf('%s-%03d-%s', $prefix, $nextNumber, $date);
     }
 }

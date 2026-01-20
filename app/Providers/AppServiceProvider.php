@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use App\Modules\Auth\Models\Customer;
+use App\Modules\Order\Models\Order;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
@@ -34,8 +36,10 @@ class AppServiceProvider extends ServiceProvider
         });
 
         $models = [
+            'customer' => Customer::class,
             'product'  => Product::class,
             'product-category'  => ProductCategory::class,
+            'order' => Order::class,
         ];
 
         foreach ($models as $key => $modelClass) {
