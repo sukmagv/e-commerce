@@ -3,9 +3,9 @@
 namespace App\Http\Controllers\Admin\v1;
 
 use Illuminate\Http\Request;
-use App\Supports\ExcelReport;
 use Illuminate\Validation\Rule;
 use Illuminate\Http\JsonResponse;
+use App\Supports\OrderExcelReport;
 use Illuminate\Support\Facades\DB;
 use App\Modules\Order\Models\Order;
 use App\Http\Controllers\Controller;
@@ -28,6 +28,7 @@ class OrderController extends Controller
         $request->validate([
             'search'     => ['sometimes', 'string'],
             'status'     => ['sometimes', 'string', Rule::enum(OrderStatus::class)],
+            'limit'      => ['sometimes', 'numeric']
         ]);
 
         $orders = Order::with(['user', 'payment.latestProof'])
@@ -137,27 +138,10 @@ class OrderController extends Controller
      */
     public function excelReport()
     {
-        // filter status dan range date
+        $status = request('status');
+        $startDate = request('start_date');
+        $endDate = request('end_date');
 
-        $orders = Order::with([
-            'user',
-            'payment.latestProof',
-            'orderItem.product',
-            'orderItem.discount',
-        ])
-        ->get()
-        ->map(fn($order) => [
-            'Order Code'    => $order->code,
-            'Order Status'  => $order->status->value,
-            'Customer Name' => $order->user->name,
-            'Items'         => $order->orderItems->map(fn($i)=>$i->product->name)->implode(', '),
-            'Grand Total'   => $order->grand_total,
-            'Payment Status'=> $order->payment?->latestProof->status->value,
-            'Created At'    => $order->created_at,
-        ]);
-
-        $headings = ['Order Code', 'Customer Name', 'Items', 'Grand Total', 'Payment Status', 'Created At'];
-
-        return Excel::download(new ExcelReport($orders, $headings), 'orders.xlsx');
+        return Excel::download(new OrderExcelReport($status, $startDate, $endDate), 'orders.xlsx');
     }
 }
