@@ -27,7 +27,7 @@ class UpdateProductAction
         $path = null;
 
         // cek apakah product sudah dipakai di order
-        $isUsedInOrder = $product->orderItems()->exists(); // revisi
+        $isUsedInOrder = $product->orderItems()->exists();
 
         $oldPath = $product->photo;
 
@@ -35,21 +35,7 @@ class UpdateProductAction
         try {
 
             if ($isUsedInOrder) {
-                $newProduct = $product->replicate([
-                    'code',
-                    'slug',
-                    'deleted_at',
-                    'created_at',
-                    'updated_at',
-                ]);
-
-                if (isset($dto->photo) && $dto->photo) {
-                    $newProduct->photo = $this->fileService->updateOrCreate($dto->photo, null, 'products');
-                } else {
-                    $newProduct->photo = $oldPath;
-                }
-
-                $newProduct->fill($dto->toArray());
+                $newProduct = $this->replicateWithPhoto($product, $dto, $oldPath);
 
                 $newProduct->save();
 
@@ -66,14 +52,7 @@ class UpdateProductAction
             }
 
             if (isset($dto->is_discount) && $dto->is_discount) {
-                DiscountValidation::calculateFinalPrice(
-                    $dto->price,
-                    $dto->discount->type,
-                    $dto->discount->amount,
-                    $dto->discount->final_price,
-                );
-
-                $discount = new ProductDiscount($dto->discount->toArray());
+                $discount = $this->applyDiscount($product, $dto);
 
                 $discount->product()->associate($product);
 
@@ -93,5 +72,51 @@ class UpdateProductAction
         }
 
         return $product;
+    }
+
+    /**
+     * Replicate product and handle photo upload
+     *
+     * @param Product $product
+     * @param UpdateProductDTO $dto
+     * @param string|null $oldPath
+     * @return Product
+     */
+    protected function replicateWithPhoto(Product $product, UpdateProductDTO $dto, ?string $oldPath): Product
+    {
+        $newProduct = $product->replicate([
+            'code',
+            'slug',
+            'deleted_at',
+            'created_at',
+            'updated_at',
+        ]);
+
+        if (isset($dto->photo) && $dto->photo) {
+            $newProduct->photo = $this->fileService->updateOrCreate($dto->photo, null, 'products');
+        } else {
+            $newProduct->photo = $oldPath;
+        }
+
+        $newProduct->fill($dto->toArray());
+
+        return $newProduct;
+    }
+
+    /**
+     * Apply discount to product
+     */
+    protected function applyDiscount(Product $product, UpdateProductDTO $dto): ProductDiscount
+    {
+        DiscountValidation::calculateFinalPrice(
+            $dto->price,
+            $dto->discount->type,
+            $dto->discount->amount,
+            $dto->discount->final_price,
+        );
+
+        $discount = new ProductDiscount($dto->discount->toArray());
+
+        return $discount;
     }
 }

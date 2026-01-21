@@ -23,8 +23,13 @@ class ProductController extends Controller
      * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
      */
-    public function index(QueryParamRequest $request)
+    public function index(Request $request)
     {
+        $request->validate([
+            'search'     => ['sometimes', 'string'],
+            'limit'      => ['sometimes', 'numeric']
+        ]);
+
         $products = Product::with('activeDiscount')
             ->search($request->search)
             ->latest()
