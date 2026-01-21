@@ -27,6 +27,7 @@ class OrderController extends Controller
      */
     public function index(Request $request)
     {
+        // tidak perlu validasi
         $request->validate([
             'search'     => ['sometimes', 'string'],
             'status'     => ['sometimes', 'string', Rule::enum(OrderStatus::class)],
@@ -87,6 +88,7 @@ class OrderController extends Controller
      */
     public function acceptProof(Order $order): JsonResponse
     {
+        // di policy
         abort_if(
             $order->payment?->latestProof->status !== PaymentStatus::PENDING,
             Response::HTTP_FORBIDDEN,

@@ -140,7 +140,7 @@ class OrderController extends Controller
      */
     public function getBanks(): JsonResource
     {
-        $banks = BankAccount::all();
+        $banks = BankAccount::paginate(10);
 
         return new JsonResource($banks);
     }
