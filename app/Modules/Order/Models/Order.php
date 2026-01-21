@@ -4,6 +4,8 @@ namespace App\Modules\Order\Models;
 
 use App\Supports\HasCode;
 use App\Supports\HasSearch;
+use App\Supports\HasStatus;
+use App\Supports\HasDateBetween;
 use App\Modules\Auth\Models\User;
 use App\Modules\Auth\Models\Customer;
 use App\Modules\Order\Models\OrderItem;
@@ -11,13 +13,11 @@ use Illuminate\Database\Eloquent\Model;
 use App\Modules\Order\Enums\OrderStatus;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Order extends Model
 {
-    use HasFactory, HasCode, HasSearch;
+    use HasFactory, HasCode, HasSearch, HasStatus, HasDateBetween;
 
     protected $fillable = [
         'user_id',
@@ -51,31 +51,5 @@ class Order extends Model
     public function payment(): HasOne
     {
         return $this->hasOne(Payment::class);
-    }
-
-    /**
-     * Get order data based on selected status
-     *
-     * @param Illuminate\Database\Eloquent\Builder $query
-     * @param string|null $status
-     * @return \Illuminate\Database\Eloquent\Builder
-     */
-    public function scopeStatus(Builder $query, ?string $status): Builder
-    {
-        return $query->when($status, fn (Builder $q) => $q->where('status', $status));
-    }
-
-    /**
-     * Get order data between selected date
-     *
-     * @param \Illuminate\Database\Eloquent\Builder $query
-     * @param string|null $startDate
-     * @param string|null $endDate
-     * @return \Illuminate\Database\Eloquent\Builder
-     */
-    public function scopeDateBetween(Builder $query, ?string $startDate = null, ?string $endDate = null): Builder {
-        return $query
-            ->when($startDate,fn (Builder $q) => $q->whereDate('created_at', '>=', $startDate))
-            ->when($endDate,fn (Builder $q) => $q->whereDate('created_at', '<=', $endDate));
     }
 }

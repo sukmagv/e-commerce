@@ -3,11 +3,10 @@
 namespace App\Http\Requests\Admin\v1;
 
 use Illuminate\Validation\Rule;
-use App\Rules\DiscountValidation;
-use App\Supports\BaseRequest;
 use App\Modules\Product\Enums\DiscountType;
+use Illuminate\Foundation\Http\FormRequest;
 
-class UpdateProductRequest extends BaseRequest
+class UpdateProductRequest extends FormRequest
 {
     /**
      * Get the validation rules that apply to the request.

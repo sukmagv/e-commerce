@@ -3,10 +3,10 @@
 namespace App\Http\Requests\Customer\v1;
 
 use Illuminate\Validation\Rule;
-use App\Supports\BaseRequest;
 use App\Modules\Auth\Enums\OtpType;
+use Illuminate\Foundation\Http\FormRequest;
 
-class OtpRequest extends BaseRequest
+class OtpRequest extends FormRequest
 {
     /**
      * Get the validation rules that apply to the request.

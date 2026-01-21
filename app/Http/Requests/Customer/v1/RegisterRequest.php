@@ -3,9 +3,9 @@
 namespace App\Http\Requests\Customer\v1;
 
 use App\Rules\VerifiedOtp;
-use App\Supports\BaseRequest;
+use Illuminate\Foundation\Http\FormRequest;
 
-class RegisterRequest extends BaseRequest
+class RegisterRequest extends FormRequest
 {
     /**
      * Get the validation rules that apply to the request.
