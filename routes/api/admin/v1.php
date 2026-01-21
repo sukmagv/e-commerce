@@ -9,12 +9,12 @@ use App\Http\Controllers\Admin\v1\ProductController;
 
 Route::post('/login', [AuthController::class, 'login']);
 
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware(['auth:sanctum', 'role:super-admin'])->group(function () {
     Route::resource('products', ProductController::class);
     Route::resource('product-categories', ProductCategoryController::class);
 
     Route::resource('orders', OrderController::class);
-    
+
     Route::get('/orders/{order}/proof', [OrderController::class, 'getProofDetail']);
     Route::patch('/orders/{order}/confirm', [OrderController::class, 'acceptProof']);
     Route::patch('/orders/{order}/decline', [OrderController::class, 'declineProof']);

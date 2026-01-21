@@ -19,7 +19,7 @@ Route::prefix('auth')->group(function () {
     });
 });
 
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware(['auth:sanctum', 'role:customer'])->group(function () {
     Route::prefix('auth')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout']);
 
@@ -33,9 +33,9 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::resource('products', ProductController::class)->only(['index', 'show']);
 
     Route::resource('orders', OrderController::class);
-    
+
     Route::post('orders/{order}/upload-proof', [OrderController::class, 'uploadProof']);
-    Route::post('orders/{order}/pdf', [OrderController::class, 'getPdf']);
+    Route::post('orders/{order}/pdf', [OrderController::class, 'printPdf']);
 
     Route::get('/bank-accounts', [OrderController::class, 'getBanks']);
 });
