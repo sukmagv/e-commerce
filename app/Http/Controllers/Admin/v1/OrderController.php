@@ -13,6 +13,7 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Http\Resources\OrderResource;
 use App\Modules\Order\Enums\OrderStatus;
 use App\Modules\Order\Enums\PaymentStatus;
+use Illuminate\Http\Request as HttpRequest;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -135,14 +136,21 @@ class OrderController extends Controller
     /**
      * Export order data to excel
      *
+     * @param \Illuminate\Http\Request $request
      * @return void
      */
-    public function excelReport()
+    public function excelReport(Request $request)
     {
-        $status = request('status');
-        $startDate = request('start_date');
-        $endDate = request('end_date');
+        $orders = Order::with([
+            'user',
+            'payment.latestProof',
+            'orderItem.product',
+            'orderItem.discount'
+        ])
+        ->status($request->input('status'))
+        ->dateBetween($request->input('start_date'), $request->input('end_date'))
+        ->get();
 
-        return Excel::download(new OrderExcelReport($status, $startDate, $endDate), 'orders.xlsx');
+        return Excel::download(new OrderExcelReport($orders), 'orders.xlsx');
     }
 }

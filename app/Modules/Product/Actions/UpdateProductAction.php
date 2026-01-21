@@ -26,7 +26,7 @@ class UpdateProductAction
     {
         $path = null;
 
-        // cek apakah product sudah dipakai di order
+        // Check product already used in order or not
         $isUsedInOrder = $product->orderItems()->exists();
 
         $oldPath = $product->photo;
