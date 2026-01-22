@@ -19,7 +19,7 @@ class ResetPasswordAction
     {
         DB::beginTransaction();
         try {
-            $otp = Otp::find($dto->otp_id);
+            $otp = Otp::find($dto->otpId);
 
             User::firstWhere('email', $otp->address)?->update([
                 'password' => $dto->password,
@@ -34,7 +34,7 @@ class ResetPasswordAction
         }
 
         // $otp->delete();
-        
+
         return true;
     }
 }

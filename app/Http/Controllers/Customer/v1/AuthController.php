@@ -31,9 +31,7 @@ class AuthController extends Controller
      */
     public function register(RegisterRequest $request, RegisterAction $action): CustomerResource
     {
-        $dto = CustomerRegisterDTO::fromRequest($request);
-
-        $customerData = $action->execute($dto);
+        $customerData = $action->execute($request->payload());
 
         return new CustomerResource($customerData);
     }
@@ -47,9 +45,7 @@ class AuthController extends Controller
      */
     public function login(LoginRequest $request, LoginAction $action): CustomerResource
     {
-        $dto = LoginDTO::fromRequest($request);
-
-        $user = $action->execute($dto);
+        $user = $action->execute($request->payload());
 
         $customer = Customer::query()
             ->where('user_id', $user->id)
@@ -82,9 +78,7 @@ class AuthController extends Controller
      */
     public function forgotPassword(ForgotPasswordRequest $request, ForgotPasswordAction $action): JsonResponse
     {
-        $dto = ForgotPasswordDTO::fromRequest($request);
-
-        $action->execute($dto);
+        $action->execute($request->payload());
 
         return new JsonResponse();
     }
@@ -98,9 +92,7 @@ class AuthController extends Controller
      */
     public function resetPassword(ResetPasswordRequest $request, ResetPasswordAction $action): JsonResponse
     {
-        $dto = ResetPasswordDTO::fromRequest($request);
-
-        $action->execute($dto);
+        $action->execute($request->payload());
 
         return new JsonResponse();
     }

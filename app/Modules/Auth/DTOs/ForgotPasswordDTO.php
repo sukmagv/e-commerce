@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 
 class ForgotPasswordDTO extends BaseDTO
 {
-    public ?int $otp_id;
-    public string $address;
+    public function __construct(
+        public ?int $otpId,
+        public string $address,
+    ) {}
 }

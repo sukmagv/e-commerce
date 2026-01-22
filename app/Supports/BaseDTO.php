@@ -2,97 +2,82 @@
 
 namespace App\Supports;
 
-use Illuminate\Http\Request;
+use UnitEnum;
 use ReflectionClass;
-use ReflectionProperty;
+use ReflectionNamedType;
+use Illuminate\Support\Str;
+use Illuminate\Http\Request;
 
 abstract class BaseDTO
 {
-    /**
-     * Create DTO from Array
-     *
-     * @param array $data
-     * @return static
-     */
     public static function fromArray(array $data): static
     {
-        $dto = new static();
-        $reflection = new ReflectionClass($dto);
+        $reflection = new ReflectionClass(static::class);
+        $constructor = $reflection->getConstructor();
 
-        foreach ($reflection->getProperties(ReflectionProperty::IS_PUBLIC) as $property) {
-            $name = $property->getName();
-
-            if (!array_key_exists($name, $data)) {
-                continue;
-            }
-
-            $value = $data[$name];
-            $type  = $property->getType()?->getName();
-
-            if (!$type) {
-                $dto->$name = $value;
-                continue;
-            }
-
-            // If property is Enum
-            if (enum_exists($type)) {
-                $dto->$name = $value !== null ? $type::from($value) : null;
-                continue;
-            }
-
-            // If property is nested DTO
-            if (class_exists($type) && is_subclass_of($type, BaseDTO::class)) {
-                $dto->$name = $type::fromArray($value);
-                continue;
-            }
-
-            $dto->$name = $value;
+        if (!$constructor) {
+            return new static();
         }
 
-        return $dto;
+        $parameters = $constructor->getParameters();
+        $args = [];
+
+        foreach ($parameters as $parameter) {
+            $name = $parameter->getName();
+            $type = $parameter->getType();
+
+            $snakeName = Str::snake($name);
+
+            $value = $data[$name] ?? $data[$snakeName] ?? null;
+
+            if (is_null($value) && $parameter->isDefaultValueAvailable()) {
+                $value = $parameter->getDefaultValue();
+            }
+
+            if ($type instanceof ReflectionNamedType && !$type->isBuiltin()) {
+                $className = $type->getName();
+
+                // 1. Handle Nested DTOs (Recursion)
+                if (is_subclass_of($className, self::class) && is_array($value)) {
+                    $value = $className::fromArray($value);
+                }
+
+                // 2. Handle Enums (Fixes your TypeError)
+                elseif (enum_exists($className) && !is_null($value) && !$value instanceof UnitEnum) {
+                    if (method_exists($className, 'from')) {
+                        $value = $className::from($value);
+                    }
+                }
+            }
+
+            $args[$name] = $value;
+        }
+
+        return new static(...$args);
+    }
+
+    public static function fromRequest(Request $request): static
+    {
+        // Use validated() to ensure only clean data enters your DTOs
+        return static::fromArray($request->validated());
     }
 
     /**
-     * Create DTO from Request
-     *
-     * @param Request $request
-     * @return static
+     * Convert DTO to array recursively (Handles Nested DTOs and Enums)
      */
-    public static function fromRequest(Request $request): static
-    {
-        return static::fromArray($request->all());
-    }
-
     public function toArray(): array
     {
-        $reflection = new \ReflectionClass($this);
-        $data = [];
+        $array = get_object_vars($this);
 
-        foreach ($reflection->getProperties(\ReflectionProperty::IS_PUBLIC) as $property) {
-            $name = $property->getName();
-
-            if (!$property->isInitialized($this)) {
-                continue;
+        array_walk_recursive($array, function (&$value) {
+            if ($value instanceof self) {
+                $value = $value->toArray();
+            } elseif ($value instanceof UnitEnum) {
+                // Check if it's a BackedEnum (has 'value') or UnitEnum (has 'name')
+                $value = $value->value ?? $value->name;
             }
+        });
 
-            $value = $this->$name;
-
-            // Enum
-            if ($value instanceof \UnitEnum) {
-                $data[$name] = $value->value;
-                continue;
-            }
-
-            // Nested DTO
-            if ($value instanceof BaseDTO) {
-                $data[$name] = $value->toArray();
-                continue;
-            }
-
-            $data[$name] = $value;
-        }
-
-        return $data;
+        return $array;
     }
-
 }

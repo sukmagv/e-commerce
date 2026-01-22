@@ -38,7 +38,7 @@ class ProfileController extends Controller
      */
     public function updateProfile(UpdateProfileRequest $request, UpdateProfileAction $action): ProfileResource
     {
-        $updatedUser = $action->execute($request->user(), $request);
+        $updatedUser = $action->execute($request->payload());
 
         return new ProfileResource($updatedUser);
     }
@@ -54,9 +54,7 @@ class ProfileController extends Controller
     {
         $user = $request->user();
 
-        $dto = ChangePasswordDTO::fromRequest($request);
-
-        $action->execute($user, $dto);
+        $action->execute($user, $request->payload());
 
         return new JsonResponse();
     }

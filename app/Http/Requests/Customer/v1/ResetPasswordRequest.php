@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Customer\v1;
 
+use App\Modules\Auth\DTOs\ResetPasswordDTO;
 use App\Rules\VerifiedOtp;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -18,5 +19,10 @@ class ResetPasswordRequest extends FormRequest
             'otp_id' => ['required', 'exists:otps,id', new VerifiedOtp],
             'password' => ['required', 'string', 'min:6', 'confirmed'],
         ];
+    }
+
+    public function payload(): ResetPasswordDTO
+    {
+        return ResetPasswordDTO::fromArray($this->validated());
     }
 }

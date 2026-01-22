@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Customer\v1;
 
+use App\Modules\Auth\DTOs\CustomerRegisterDTO;
 use App\Rules\VerifiedOtp;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -22,5 +23,10 @@ class RegisterRequest extends FormRequest
             'photo' => ['nullable', 'file', 'max:2048'],
             'password' => ['required', 'string', 'min:6'],
         ];
+    }
+
+    public function payload(): CustomerRegisterDTO
+    {
+        return CustomerRegisterDTO::fromArray($this->validated());
     }
 }

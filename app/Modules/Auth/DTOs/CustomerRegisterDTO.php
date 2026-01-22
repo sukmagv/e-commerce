@@ -8,11 +8,14 @@ use Illuminate\Http\UploadedFile;
 
 class CustomerRegisterDTO extends BaseDTO
 {
-    public string $email;
-    public string $name;
-    public ?string $phone;
-    public ?UploadedFile $photo;
-    public string $password;
+    public function __construct(
+        public string $email,
+        public string $name,
+        public ?string $phone,
+        public ?UploadedFile $photo,
+        public string $password,
+    ) {}
+
 
     public function toCustomerData(): array
     {

@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 
 class ChangePasswordDTO extends BaseDTO
 {
-    public string $currentPassword;
-    public string $newPassword;
+    public function __construct(
+        public string $currentPassword,
+        public string $newPassword,
+    ) {}
 }

@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Customer\v1;
 
+use App\Modules\Auth\DTOs\ForgotPasswordDTO;
 use Illuminate\Foundation\Http\FormRequest;
 
 class ForgotPasswordRequest extends FormRequest
@@ -17,5 +18,10 @@ class ForgotPasswordRequest extends FormRequest
             'otp_id' => ['nullable', 'integer'],
             'address' => ['required', 'email', 'exists:users,email'],
         ];
+    }
+
+    public function payload(): ForgotPasswordDTO
+    {
+        return ForgotPasswordDTO::fromArray($this->validated());
     }
 }

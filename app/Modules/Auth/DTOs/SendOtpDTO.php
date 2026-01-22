@@ -8,7 +8,9 @@ use App\Modules\Auth\Enums\OtpType;
 
 class SendOtpDTO extends BaseDTO
 {
-    public ?int $otp_id;
-    public string $address;
-    public OtpType $type;
+    public function __construct(
+        public ?int $otpId,
+        public string $address,
+        public OtpType $type,
+    ) {}
 }

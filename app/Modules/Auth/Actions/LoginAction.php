@@ -28,7 +28,7 @@ class LoginAction
             throw ValidationException::withMessages(['message' => 'Email or password is incorrect']);
         }
 
-        if ($user->isBlocked()) {
+        if ($user->customer->isBlocked()) {
             throw ValidationException::withMessages(['message' => 'Account is blocked']);
         }
 

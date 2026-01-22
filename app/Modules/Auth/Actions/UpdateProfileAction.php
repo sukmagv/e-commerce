@@ -6,6 +6,8 @@ use App\Services\FileService;
 use App\Modules\Auth\Models\User;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use App\Modules\Auth\DTOs\UpdateProfileDTO;
 use App\Http\Requests\Customer\v1\UpdateProfileRequest;
 
 class UpdateProfileAction
@@ -20,18 +22,21 @@ class UpdateProfileAction
      * @param \App\Http\Requests\Customer\v1\UpdateProfileRequest $request
      * @return \App\Modules\Auth\Models\User
      */
-    public function execute(User $user, UpdateProfileRequest $request): User
+    public function execute(UpdateProfileDTO $dto): User
     {
         DB::beginTransaction();
         try {
-            $user->update($request->only('name'));
+            /** @var \App\Modules\Auth\Models\User $user */
+            $user = Auth::user();
 
-            $customerData = $request->only('phone');
+            $user->update(['name' => $dto->name]);
+
+            $customerData = $dto->phone;
 
             $oldPath = $user->customer->photo;
 
-            if ($request->hasFile('photo') && $request->file('photo') instanceof UploadedFile) {
-                $customerData['photo'] = $this->fileService->updateOrCreate($request->photo, $oldPath, 'profile');
+            if ($dto->photo && $dto->photo instanceof UploadedFile) {
+                $customerData['photo'] = $this->fileService->updateOrCreate($dto->photo, $oldPath, 'profile');
             }
 
             if ($user->customer && $customerData) {

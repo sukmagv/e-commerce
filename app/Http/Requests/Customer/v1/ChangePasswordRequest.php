@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Customer\v1;
 
+use App\Modules\Auth\DTOs\ChangePasswordDTO;
 use Illuminate\Foundation\Http\FormRequest;
 
 class ChangePasswordRequest extends FormRequest
@@ -17,5 +18,10 @@ class ChangePasswordRequest extends FormRequest
             'current_password' => ['required', 'string', 'min:6'],
             'new_password' => ['required', 'string', 'min:6', 'confirmed'],
         ];
+    }
+
+    public function payload(): ChangePasswordDTO
+    {
+        return ChangePasswordDTO::fromArray($this->validated());
     }
 }

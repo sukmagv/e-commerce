@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Customer\v1;
 
+use App\Modules\Auth\DTOs\LoginDTO;
 use Illuminate\Foundation\Http\FormRequest;
 
 class LoginRequest extends FormRequest
@@ -17,5 +18,10 @@ class LoginRequest extends FormRequest
             'email' => ['required', 'email', 'exists:users,email'],
             'password' => ['required', 'string', 'min:6'],
         ];
+    }
+
+    public function payload(): LoginDTO
+    {
+        return LoginDTO::fromArray($this->validated());
     }
 }

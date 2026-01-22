@@ -7,6 +7,8 @@ use Illuminate\Http\Request;
 
 class ResetPasswordDTO extends BaseDTO
 {
-    public int $otp_id;
-    public string $password;
+    public function __construct(
+        public int $otpId,
+        public string $password,
+    ) {}
 }

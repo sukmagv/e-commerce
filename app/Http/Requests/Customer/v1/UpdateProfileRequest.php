@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Customer\v1;
 
+use App\Modules\Auth\DTOs\UpdateProfileDTO;
 use Illuminate\Foundation\Http\FormRequest;
 
 class UpdateProfileRequest extends FormRequest
@@ -20,5 +21,10 @@ class UpdateProfileRequest extends FormRequest
             'phone' => ['sometimes', 'string', 'min:11', 'regex:/^[0-9]+$/'],
             'photo' => ['sometimes', 'file', 'image', 'mimes:jpeg,png,jpg', 'max:2048'],
         ];
+    }
+
+    public function payload(): UpdateProfileDTO
+    {
+        return UpdateProfileDTO::fromArray($this->validated());
     }
 }
