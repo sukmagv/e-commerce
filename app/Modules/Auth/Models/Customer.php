@@ -32,6 +32,11 @@ class Customer extends Model
         'is_blocked' => 'boolean'
     ];
 
+    public function isBlocked(): bool
+    {
+        return $this->is_blocked;
+    }
+
     protected function photo(): Attribute
     {
         return Attribute::make(

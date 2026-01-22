@@ -36,14 +36,12 @@ class OrderPolicy
 
     public function uploadProof(User $user, Order $order): bool
     {
-        return $user->role->slug === 'customer'
-            && $order->user_id === $user->id;
+        return $this->view($user, $order);
     }
 
 
     public function printPdf(User $user, Order $order): bool
     {
-        return $user->role->slug === 'customer'
-            && $order->user_id === $user->id;
+        return $this->view($user, $order);
     }
 }

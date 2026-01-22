@@ -6,13 +6,14 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 use App\Modules\Order\Enums\PaymentType;
 use App\Modules\Order\Enums\PaymentStatus;
+use App\Supports\EnsureStatus;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class PaymentProof extends Model
 {
-    use HasFactory;
+    use HasFactory, EnsureStatus;
 
     /** @var string */
     const FILE_PATH = 'paymentProof/';

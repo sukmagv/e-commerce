@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Hash;
 use App\Modules\Auth\Models\Customer;
 use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Http\Exceptions\HttpResponseException;
+use Illuminate\Validation\ValidationException;
 
 class LoginAction
 {
@@ -24,11 +25,11 @@ class LoginAction
             ->first();
 
         if (!$user || !Hash::check($dto->password, $user->password)) {
-            throw new HttpResponseException(
-                response()->json([
-                    'message' => 'Email or password is incorrect'
-                ], Response::HTTP_UNAUTHORIZED)
-            );
+            throw ValidationException::withMessages(['message' => 'Email or password is incorrect']);
+        }
+
+        if ($user->isBlocked()) {
+            throw ValidationException::withMessages(['message' => 'Account is blocked']);
         }
 
         $user->token = $user->generateToken();
