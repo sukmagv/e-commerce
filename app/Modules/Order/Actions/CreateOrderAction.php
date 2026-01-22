@@ -71,11 +71,11 @@ class CreateOrderAction
      */
     protected function validateProductPrice(CreateOrderDTO $dto, Product $product): void
     {
-        if ($dto->item->normal_price != $product->price) {
+        if ($dto->item->normalPrice != $product->price) {
             throw ValidationException::withMessages(['message' => ['Normal price is invalid.']]);
         }
 
-        if ($dto->item->total_price != ($dto->item->qty * $product->price)) {
+        if ($dto->item->totalPrice != ($dto->item->qty * $product->price)) {
             throw ValidationException::withMessages(['message' => ['Total price is invalid.']]);
         }
 
@@ -88,19 +88,19 @@ class CreateOrderAction
             }
 
             DiscountValidation::calculateFinalPrice(
-                $dto->item->normal_price,
+                $dto->item->normalPrice,
                 $dto->item->discount->type,
                 $dto->item->discount->amount,
-                $dto->item->discount->final_price
+                $dto->item->discount->finalPrice
             );
         }
 
-        $expectedDiscountPrice = $dto->item->qty * ($dto->item->normal_price - $dto->item->discount->final_price);
-        if ($dto->item->discount_price != $expectedDiscountPrice) {
+        $expectedDiscountPrice = $dto->item->qty * ($dto->item->normalPrice - $dto->item->discount->finalPrice);
+        if ($dto->item->discountPrice != $expectedDiscountPrice) {
             throw ValidationException::withMessages(['message' => ['Discount price is invalid.']]);
         }
 
-        if ($dto->item->final_price !== ($dto->item->total_price - $dto->item->discount_price)) {
+        if ($dto->item->finalPrice !== ($dto->item->totalPrice - $dto->item->discountPrice)) {
             throw ValidationException::withMessages(['message' => ['Final price is invalid.']]);
         }
     }
@@ -113,17 +113,17 @@ class CreateOrderAction
      */
     protected function validateOrderPrice(CreateOrderDTO $dto): void
     {
-        $taxAmount = ($dto->item->final_price * 11) / 100; // bikin const di model
+        $taxAmount = ($dto->item->finalPrice * 11) / 100; // bikin const di model
 
-        if ($dto->sub_total != $dto->item->final_price) {
+        if ($dto->subTotal != $dto->item->finalPrice) {
             throw ValidationException::withMessages(['message' => ['Sub total price is invalid.']]);
         }
 
-        if ($dto->tax_amount != $taxAmount) {
+        if ($dto->taxAmount != $taxAmount) {
             throw ValidationException::withMessages(['message' => ['Tax amount is invalid.' . $taxAmount]]);
         }
 
-        if ($dto->grand_total != $dto->sub_total + $taxAmount) {
+        if ($dto->grandTotal != $dto->subTotal + $taxAmount) {
             throw ValidationException::withMessages(['message' => ['Grand total price is invalid.']]);
         }
     }

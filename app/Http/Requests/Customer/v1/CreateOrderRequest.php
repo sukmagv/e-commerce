@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Customer\v1;
 
+use App\Modules\Order\DTOs\CreateOrderDTO;
 use Illuminate\Validation\Rule;
 use App\Modules\Product\Enums\DiscountType;
 use Illuminate\Foundation\Http\FormRequest;
@@ -35,5 +36,10 @@ class CreateOrderRequest extends FormRequest
             'grand_total' => ['required', 'numeric', 'min:1'],
             'note' => ['nullable', 'string', 'max:100'],
         ];
+    }
+
+    public function payload(): CreateOrderDTO
+    {
+        return CreateOrderDTO::fromArray($this->validated());
     }
 }

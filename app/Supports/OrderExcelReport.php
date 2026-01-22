@@ -2,37 +2,44 @@
 
 namespace App\Supports;
 
-use Illuminate\Support\Collection;
-use Maatwebsite\Excel\Concerns\FromCollection;
+use App\Modules\Order\Models\Order;
+use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\WithHeadings;
 use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithColumnWidths;
 use Maatwebsite\Excel\Concerns\WithStyles;
+use Maatwebsite\Excel\Concerns\WithChunkReading;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 
-class OrderExcelReport implements FromCollection, WithHeadings, WithMapping, WithColumnWidths, WithStyles
+class OrderExcelReport implements FromQuery, WithHeadings, WithMapping, WithColumnWidths, WithStyles, WithChunkReading
 {
-    protected Collection $orders;
+    protected ?string $status;
+    protected ?string $startDate;
+    protected ?string $endDate;
 
-    /**
-     * @param Collection $orders
-     */
-    public function __construct(Collection $orders)
+    public function __construct(?string $status = null, ?string $startDate = null, ?string $endDate = null)
     {
-        $this->orders = $orders;
+        $this->status = $status;
+        $this->startDate = $startDate;
+        $this->endDate = $endDate;
     }
 
     /**
-     * Data source for excel
+     * Query data for export
      */
-    public function collection(): Collection
+    public function query()
     {
-        return $this->orders;
+        return Order::with([
+                'user',
+                'payment.latestProof',
+                'orderItem.product',
+                'orderItem.discount'
+            ])
+            ->when($this->status, fn($q) => $q->where('status', $this->status))
+            ->when($this->startDate, fn($q) => $q->whereDate('created_at', '>=', $this->startDate))
+            ->when($this->endDate, fn($q) => $q->whereDate('created_at', '<=', $this->endDate));
     }
 
-    /**
-     * Column header
-     */
     public function headings(): array
     {
         return [
@@ -45,9 +52,6 @@ class OrderExcelReport implements FromCollection, WithHeadings, WithMapping, Wit
         ];
     }
 
-    /**
-     * Row mapping
-     */
     public function map($order): array
     {
         return [
@@ -60,9 +64,6 @@ class OrderExcelReport implements FromCollection, WithHeadings, WithMapping, Wit
         ];
     }
 
-    /**
-     * Column width
-     */
     public function columnWidths(): array
     {
         return [
@@ -75,13 +76,18 @@ class OrderExcelReport implements FromCollection, WithHeadings, WithMapping, Wit
         ];
     }
 
-    /**
-     * Styling header
-     */
     public function styles(Worksheet $sheet)
     {
         $sheet->getStyle('A1:F1')->getFont()->setBold(true);
         $sheet->setAutoFilter($sheet->calculateWorksheetDimension());
         $sheet->freezePane('A2');
+    }
+
+    /**
+     * Chunk size for reading
+     */
+    public function chunkSize(): int
+    {
+        return 100;
     }
 }

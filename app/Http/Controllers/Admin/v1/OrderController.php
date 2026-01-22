@@ -13,8 +13,6 @@ use Maatwebsite\Excel\Facades\Excel;
 use App\Http\Resources\OrderResource;
 use App\Modules\Order\Enums\OrderStatus;
 use App\Modules\Order\Enums\PaymentStatus;
-use Illuminate\Http\Request as HttpRequest;
-use Symfony\Component\HttpFoundation\Response;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class OrderController extends Controller
@@ -27,7 +25,6 @@ class OrderController extends Controller
      */
     public function index(Request $request)
     {
-        // tidak perlu validasi
         $request->validate([
             'search'     => ['sometimes', 'string'],
             'status'     => ['sometimes', 'string', Rule::enum(OrderStatus::class)],
@@ -88,12 +85,7 @@ class OrderController extends Controller
      */
     public function acceptProof(Order $order): JsonResponse
     {
-        // di policy
-        abort_if(
-            $order->payment?->latestProof->status !== PaymentStatus::PENDING,
-            Response::HTTP_FORBIDDEN,
-            'Proof already accepted or declined'
-        );
+        $order->payment?->latestProof->ensureStatus(PaymentStatus::PENDING->value);
 
         DB::transaction(function () use ($order) {
             $order->payment->latestProof->update([
@@ -116,11 +108,7 @@ class OrderController extends Controller
      */
     public function declineProof(Order $order): JsonResponse
     {
-        abort_if(
-            $order->payment?->latestProof->status !== PaymentStatus::PENDING,
-            Response::HTTP_FORBIDDEN,
-            'Proof already accepted or declined'
-        );
+        $order->payment?->latestProof->ensureStatus(PaymentStatus::PENDING->value);
 
         DB::transaction(function () use ($order) {
             $order->payment->latestProof->update([
@@ -143,16 +131,19 @@ class OrderController extends Controller
      */
     public function excelReport(Request $request)
     {
-        $orders = Order::with([
-            'user',
-            'payment.latestProof',
-            'orderItem.product',
-            'orderItem.discount'
-        ])
-        ->status($request->input('status'))
-        ->dateBetween($request->input('start_date'), $request->input('end_date'))
-        ->get();
+        $request->validate([
+            'status'     => ['sometimes', 'string', Rule::enum(OrderStatus::class)],
+            'start_date' => ['sometimes', 'date'],
+            'end_date'   => ['sometimes', 'date', 'after_or_equal:start_date'],
+        ]);
 
-        return Excel::download(new OrderExcelReport($orders), 'orders.xlsx');
+        return Excel::download(
+            new OrderExcelReport(
+                $request->input('status'),
+                $request->input('start_date'),
+                $request->input('end_date')
+            ),
+            'orders.xlsx'
+        );
     }
 }

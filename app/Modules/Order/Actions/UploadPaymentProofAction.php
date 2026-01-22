@@ -34,8 +34,8 @@ class UploadPaymentProofAction
                 ['status' => PaymentStatus::PENDING],
                 ));
 
-            if ($dto->proof_link) {
-                $path = $this->fileService->updateOrCreate($dto->proof_link, null, 'paymentProof');
+            if ($dto->proofLink) {
+                $path = $this->fileService->updateOrCreate($dto->proofLink, null, 'paymentProof');
                 $paymentProof->proof_link = $path;
             }
 

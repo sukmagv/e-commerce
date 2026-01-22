@@ -67,9 +67,7 @@ class OrderController extends Controller
      */
     public function store(CreateOrderRequest $request, CreateOrderAction $action): OrderResource
     {
-        $dto = CreateOrderDTO::fromRequest($request);
-
-        $order = $action->execute($dto);
+        $order = $action->execute($request->payload());
 
         return new OrderResource($order);
     }
@@ -104,9 +102,7 @@ class OrderController extends Controller
     {
         $this->authorize('uploadProof', $order);
 
-        $dto = UploadPaymentProofDTO::fromRequest($request);
-
-        $order = $action->execute($dto, $order);
+        $order = $action->execute($request->payload(), $order);
 
         return new JsonResponse();
     }

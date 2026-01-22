@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Customer\v1;
 
+use App\Modules\Order\DTOs\UploadPaymentProofDTO;
 use Illuminate\Validation\Rule;
 use App\Modules\Order\Enums\PaymentType;
 use Illuminate\Foundation\Http\FormRequest;
@@ -20,5 +21,10 @@ class PaymentProofRequest extends FormRequest
             'type'       => ['required', 'string', Rule::enum(PaymentType::class)],
             'note'       => ['nullable', 'string', 'max:100'],
         ];
+    }
+
+    public function payload(): UploadPaymentProofDTO
+    {
+        return UploadPaymentProofDTO::fromArray($this->validated());
     }
 }

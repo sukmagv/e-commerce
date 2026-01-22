@@ -9,9 +9,9 @@ class OrderItemDTO extends BaseDTO
 {
     public string $code;
     public int $qty;
-    public float $normal_price;
-    public float $total_price;
-    public float $discount_price;
+    public float $normalPrice;
+    public float $totalPrice;
+    public float $discountPrice;
     public ?DiscountDTO $discount;
-    public float $final_price;
+    public float $finalPrice;
 }
