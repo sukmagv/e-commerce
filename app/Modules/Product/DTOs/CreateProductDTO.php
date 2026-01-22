@@ -9,10 +9,12 @@ use Illuminate\Http\UploadedFile;
 
 class CreateProductDTO extends BaseDTO
 {
-    public int $category_id;
-    public string $name;
-    public UploadedFile $photo;
-    public float $price;
-    public bool $is_discount;
-    public ?DiscountDTO $discount;
+    public function __construct(
+        public int $categoryId,
+        public string $name,
+        public UploadedFile $photo,
+        public float $price,
+        public bool $isDiscount,
+        public ?DiscountDTO $discount,
+    ) {}
 }

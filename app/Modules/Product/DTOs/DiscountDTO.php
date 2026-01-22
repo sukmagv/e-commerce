@@ -7,7 +7,9 @@ use App\Supports\BaseDTO;
 
 class DiscountDTO extends BaseDTO
 {
-    public DiscountType $type;
-    public float $amount;
-    public float $final_price;
+    public function __construct(
+        public DiscountType $type,
+        public float $amount,
+        public float $finalPrice,
+    ) {}
 }

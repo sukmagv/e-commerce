@@ -68,16 +68,21 @@ abstract class BaseDTO
     public function toArray(): array
     {
         $array = get_object_vars($this);
+        $result = [];
 
-        array_walk_recursive($array, function (&$value) {
+        foreach ($array as $key => $value) {
+            // Ubah categoryId menjadi category_id untuk Database
+            $snakeKey = Str::snake($key);
+
             if ($value instanceof self) {
-                $value = $value->toArray();
-            } elseif ($value instanceof UnitEnum) {
-                // Check if it's a BackedEnum (has 'value') or UnitEnum (has 'name')
-                $value = $value->value ?? $value->name;
+                $result[$snakeKey] = $value->toArray();
+            } elseif ($value instanceof \UnitEnum) {
+                $result[$snakeKey] = $value->value ?? $value->name;
+            } else {
+                $result[$snakeKey] = $value;
             }
-        });
+        }
 
-        return $array;
+        return $result;
     }
 }

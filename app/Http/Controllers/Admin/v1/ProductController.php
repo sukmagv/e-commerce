@@ -47,9 +47,7 @@ class ProductController extends Controller
      */
     public function store(CreateProductRequest $request, CreateProductAction $action): ProductResource
     {
-        $dto = CreateProductDTO::fromRequest($request);
-
-        $product = $action->execute($dto);
+        $product = $action->execute($request->payload());
 
         return (new ProductResource($product->loadMissing('activeDiscount')))->getDetail();
     }
@@ -75,9 +73,7 @@ class ProductController extends Controller
      */
     public function update(UpdateProductRequest $request, Product $product, UpdateProductAction $action): ProductResource
     {
-        $dto = UpdateProductDTO::fromRequest($request);
-
-        $product = $action->execute($dto, $product);
+        $product = $action->execute($request->payload(), $product);
 
         return (new ProductResource($product->loadMissing('activeDiscount')))->getDetail();
     }

@@ -44,6 +44,8 @@ class UpdateProductAction
             } else {
                 $updateData = $dto->toArray();
 
+                $updateData = array_filter($updateData, fn($value) => !is_null($value));
+
                 if (isset($dto->photo) && $dto->photo) {
                     $updateData['photo'] = $this->fileService->updateOrCreate($dto->photo, $oldPath, 'products');
                 }
@@ -51,7 +53,7 @@ class UpdateProductAction
                 $product->update($updateData);
             }
 
-            if (isset($dto->is_discount) && $dto->is_discount) {
+            if (isset($dto->isDiscount) && $dto->isDiscount) {
                 $discount = $this->applyDiscount($product, $dto);
 
                 $discount->product()->associate($product);
@@ -97,8 +99,10 @@ class UpdateProductAction
         } else {
             $newProduct->photo = $oldPath;
         }
-
-        $newProduct->fill($dto->toArray());
+            $newProduct->fill(array_filter(
+                $dto->toArray(),
+                function ($value) {return !is_null($value);}
+            ));
 
         return $newProduct;
     }
@@ -112,7 +116,7 @@ class UpdateProductAction
             $dto->price,
             $dto->discount->type,
             $dto->discount->amount,
-            $dto->discount->final_price,
+            $dto->discount->finalPrice,
         );
 
         $discount = new ProductDiscount($dto->discount->toArray());

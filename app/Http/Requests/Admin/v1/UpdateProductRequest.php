@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Admin\v1;
 
+use App\Modules\Product\DTOs\UpdateProductDTO;
 use Illuminate\Validation\Rule;
 use App\Modules\Product\Enums\DiscountType;
 use Illuminate\Foundation\Http\FormRequest;
@@ -28,5 +29,10 @@ class UpdateProductRequest extends FormRequest
             'discount.amount'      => ['required_if:is_discount,true,1', 'numeric', 'min:1'],
             'discount.final_price' => ['required_if:is_discount,true,1', 'numeric', 'min:1'],
         ];
+    }
+
+    public function payload(): UpdateProductDTO
+    {
+        return UpdateProductDTO::fromArray($this->validated());
     }
 }

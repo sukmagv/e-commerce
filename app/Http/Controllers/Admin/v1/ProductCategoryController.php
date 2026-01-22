@@ -28,7 +28,7 @@ class ProductCategoryController extends Controller
     public function store(Request $request): ProductCategoryResource
     {
         $vallidatedData = $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => ['required', 'string', 'max:255'],
         ]);
 
         $productCategory = ProductCategory::create($vallidatedData);
@@ -57,7 +57,7 @@ class ProductCategoryController extends Controller
     public function update(Request $request, ProductCategory $productCategory): ProductCategoryResource
     {
         $validatedData = $request->validate([
-            'name' => 'required|string|max:255',
+            'name' => ['required', 'string', 'max:255'],
         ]);
 
         $productCategory->update($validatedData);

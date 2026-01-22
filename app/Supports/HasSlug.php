@@ -15,7 +15,8 @@ trait HasSlug
     {
         static::saving(function ($model) {
             if ($model->isDirty('name')) {
-                $model->slug = static::uniqueSlug($model->name, $model->id);
+                $name = $model->name ?? 'default'; // fallback jika null
+                $model->slug = static::uniqueSlug($name, $model->id);
             }
         });
     }

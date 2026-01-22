@@ -22,9 +22,4 @@ class ProductCategory extends Model
     {
         return $this->hasMany(Product::class);
     }
-
-    protected static function newFactory()
-    {
-        return ProductCategoryFactory::new();
-    }
 }

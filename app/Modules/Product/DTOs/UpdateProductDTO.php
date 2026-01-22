@@ -9,11 +9,13 @@ use App\Modules\Product\Enums\DiscountType;
 
 class UpdateProductDTO extends BaseDTO
 {
-    public ?int $category_id;
-    public ?string $name;
-    public ?UploadedFile $photo;
-    public ?float $price;
-    public ?bool $is_discount;
-    public ?bool $is_active;
-    public ?DiscountDTO $discount;
+    public function __construct(
+        public ?int $categoryId,
+        public ?string $name,
+        public ?UploadedFile $photo,
+        public ?float $price,
+        public ?bool $isDiscount,
+        public ?bool $isActive,
+        public ?DiscountDTO $discount,
+    ) {}
 }

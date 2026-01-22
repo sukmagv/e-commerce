@@ -3,8 +3,10 @@
 namespace App\Http\Requests\Admin\v1;
 
 use Illuminate\Validation\Rule;
+use App\Modules\Product\DTOs\DiscountDTO;
 use App\Modules\Product\Enums\DiscountType;
 use Illuminate\Foundation\Http\FormRequest;
+use App\Modules\Product\DTOs\CreateProductDTO;
 
 class CreateProductRequest extends FormRequest
 {
@@ -27,5 +29,10 @@ class CreateProductRequest extends FormRequest
             'discount.amount'      => ['required_with:discount', 'numeric', 'min:1'],
             'discount.final_price' => ['required_with:discount', 'numeric', 'min:1'],
         ];
+    }
+
+    public function payload(): CreateProductDTO
+    {
+        return CreateProductDTO::fromArray($this->validated());
     }
 }
