@@ -139,7 +139,7 @@ return [
         ],
 
         'order' => [
-            'driver' => 'single',
+            'driver' => 'daily',
             'path' => storage_path('logs/order.log'),
             'level' => 'info',
         ],

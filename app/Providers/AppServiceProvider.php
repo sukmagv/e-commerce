@@ -6,14 +6,11 @@ use Illuminate\Support\Facades\DB;
 use App\Modules\Order\Models\Order;
 use Illuminate\Support\Facades\Log;
 use App\Modules\Auth\Models\Customer;
-use App\Modules\Order\Models\Payment;
-use App\Supports\TransactionObserver;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Schema;
 use App\Modules\Product\Models\Product;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\Validator;
 use App\Modules\Product\Models\ProductCategory;
+use App\Supports\OrderObserver;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -37,7 +34,7 @@ class AppServiceProvider extends ServiceProvider
             ]);
         });
 
-        Order::observe(TransactionObserver::class);
+        Order::observe(OrderObserver::class);
 
         $models = [
             'customer' => Customer::class,
