@@ -2,7 +2,9 @@
 
 namespace App\Supports;
 
+use App\Modules\Product\DTOs\DiscountDTO;
 use App\Modules\Product\Enums\DiscountType;
+use App\Modules\Product\Models\Product;
 use Illuminate\Validation\ValidationException;
 
 class DiscountValidation
@@ -10,23 +12,23 @@ class DiscountValidation
     /**
      * Validate input price with calculated price from database
      *
-     * @param float $price
-     * @param \App\Modules\Product\Enums\DiscountType $type
-     * @param float $amount
-     * @param float $finalPrice
-     * @return integer
+     * @param \App\Modules\Product\Models\Product $product
+     * @param \App\Modules\Product\DTOs\DiscountDTO $discount
+     * @return float
      */
-    public static function calculateFinalPrice(float $price, DiscountType $type, float $amount, float $finalPrice): int
+    public static function calculateFinalPrice(Product $product, DiscountDTO $discount): float
     {
-        $expectedFinalPrice = match ($type) {
+        $price = $product->price;
+
+        $expectedFinalPrice = match ($discount->type) {
             DiscountType::NOMINAL =>
-                $price - $amount,
+                $price - $discount->amount,
 
             DiscountType::PERCENTAGE =>
-                round($price - ($price * $amount / 100)),
+                round($price - ($price * $discount->amount / 100)),
         };
 
-        if ($expectedFinalPrice !== $finalPrice) {
+        if ($expectedFinalPrice !== $discount->finalPrice) {
             throw ValidationException::withMessages([
                 'message' => ['Discount Final price is invalid.'],
             ]);
