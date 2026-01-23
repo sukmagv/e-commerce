@@ -11,6 +11,7 @@ use App\Modules\Order\Models\Order;
 use App\Http\Controllers\Controller;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Http\Resources\OrderResource;
+use App\Modules\Order\Actions\ChangeOrderStatusAction;
 use App\Modules\Order\Enums\OrderStatus;
 use App\Modules\Order\Enums\PaymentStatus;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -83,19 +84,9 @@ class OrderController extends Controller
      * @param \App\Modules\Order\Models\Order $order
      * @return \Illuminate\Http\JsonResponse
      */
-    public function acceptProof(Order $order): JsonResponse
+    public function acceptProof(Order $order, ChangeOrderStatusAction $action): JsonResponse
     {
-        $order->payment?->latestProof->ensureStatus(PaymentStatus::PENDING->value);
-
-        DB::transaction(function () use ($order) {
-            $order->payment->latestProof->update([
-                'status' => PaymentStatus::ACCEPTED,
-            ]);
-
-            $order->update([
-                'status' => OrderStatus::FINISHED,
-            ]);
-        });
+        $action->execute($order, PaymentStatus::ACCEPTED);
 
         return new JsonResponse();
     }
@@ -106,19 +97,9 @@ class OrderController extends Controller
      * @param \App\Modules\Order\Models\Order $order
      * @return \Illuminate\Http\JsonResponse
      */
-    public function declineProof(Order $order): JsonResponse
+    public function declineProof(Order $order, ChangeOrderStatusAction $action): JsonResponse
     {
-        $order->payment?->latestProof->ensureStatus(PaymentStatus::PENDING->value);
-
-        DB::transaction(function () use ($order) {
-            $order->payment->latestProof->update([
-                'status' => PaymentStatus::DECLINED,
-            ]);
-
-            $order->update([
-                'status' => OrderStatus::DECLINED,
-            ]);
-        });
+        $action->execute($order, PaymentStatus::DECLINED);
 
         return new JsonResponse();
     }

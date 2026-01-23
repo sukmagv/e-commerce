@@ -5,6 +5,7 @@ namespace App\Modules\Order\Models;
 use App\Supports\HasCode;
 use App\Supports\HasSearch;
 use App\Supports\HasStatus;
+use App\Supports\EnsureStatus;
 use App\Supports\HasDateBetween;
 use App\Modules\Auth\Models\User;
 use App\Modules\Auth\Models\Customer;
@@ -17,7 +18,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Order extends Model
 {
-    use HasFactory, HasCode, HasSearch, HasStatus, HasDateBetween;
+    use HasFactory, HasCode, HasSearch, HasStatus, HasDateBetween, EnsureStatus;
 
     protected $fillable = [
         'user_id',
