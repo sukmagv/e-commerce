@@ -40,11 +40,11 @@ class PaymentProof extends Model
      *
      * @return \Illuminate\Database\Eloquent\Casts\Attribute
      */
-    protected function proofFile(): Attribute
+    protected function proofLink(): Attribute
     {
         return Attribute::make(
             get: fn (?string $value) =>
-                $value ?? Storage::url(self::FILE_PATH . $value)
-            );
+                $value ? asset(Storage::url(self::FILE_PATH . $value)) : null
+        );
     }
 }

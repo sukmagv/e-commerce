@@ -41,7 +41,7 @@ class Customer extends Model
     {
         return Attribute::make(
             get: fn (?string $value) =>
-                $value ?? Storage::url(self::IMAGE_PATH . $value)
-            );
+                $value ? asset(Storage::url(self::IMAGE_PATH . $value)) : null
+        );
     }
 }
