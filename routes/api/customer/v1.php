@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Customer\v1\OtpController;
 use App\Http\Controllers\Customer\v1\AuthController;
+use App\Http\Controllers\Customer\v1\BankController;
 use App\Http\Controllers\Customer\v1\OrderController;
 use App\Http\Controllers\Customer\v1\ProductController;
 use App\Http\Controllers\Customer\v1\ProfileController;
@@ -37,5 +38,5 @@ Route::middleware(['auth:sanctum', 'role:customer'])->group(function () {
     Route::post('orders/{order}/upload-proof', [OrderController::class, 'uploadProof']);
     Route::post('orders/{order}/pdf', [OrderController::class, 'printPdf']);
 
-    Route::get('/bank-accounts', [OrderController::class, 'getBanks']);
+    Route::get('/bank-accounts', [BankController::class, 'index']);
 });

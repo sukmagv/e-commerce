@@ -128,16 +128,4 @@ class OrderController extends Controller
 
         return $pdf->download("order-{$order->code}.pdf");
     }
-
-    /**
-     * Show bank list
-     *
-     * @return \Illuminate\Http\Resources\Json\JsonResource
-     */
-    public function getBanks(): JsonResource
-    {
-        $banks = BankAccount::paginate(10);
-
-        return new JsonResource($banks);
-    }
 }
