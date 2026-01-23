@@ -10,7 +10,9 @@ use Illuminate\Http\UploadedFile;
 
 class UploadPaymentProofDTO extends BaseDTO
 {
-    public UploadedFile $proofLink;
-    public PaymentType $type;
-    public ?string $note;
+    public function __construct(
+        public UploadedFile $proofLink,
+        public PaymentType $type,
+        public ?string $note,
+    ) {}
 }

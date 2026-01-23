@@ -16,12 +16,19 @@ class UploadPaymentProofAction
     public function __construct(protected FileService $fileService)
     {}
 
+    /**
+     * Store payment proof from customer order
+     *
+     * @param \App\Modules\Order\DTOs\UploadPaymentProofDTO $dto
+     * @param \App\Modules\Order\Models\Order $order
+     * @return \App\Modules\Order\Models\PaymentProof
+     */
     public function execute(UploadPaymentProofDTO $dto, Order $order): PaymentProof
     {
+        $payment = Payment::where('order_id', $order->id)->first();
+
         DB::beginTransaction();
         try {
-            $payment = Payment::where('order_id', $order->id)->first();
-
             if (!$payment) {
                 $payment = Payment::create([
                     'order_id' => $order->id,
@@ -35,7 +42,7 @@ class UploadPaymentProofAction
                 ));
 
             if ($dto->proofLink) {
-                $path = $this->fileService->updateOrCreate($dto->proofLink, null, 'paymentProof');
+                $path = $this->fileService->updateOrCreate($dto->proofLink, null, PaymentProof::FILE_PATH);
                 $paymentProof->proof_link = $path;
             }
 
@@ -43,14 +50,16 @@ class UploadPaymentProofAction
 
             $paymentProof->save();
 
-            $order->update([
-                'status' => OrderStatus::IN_PROGRESS,
-            ]);
+            $order->update(['status' => OrderStatus::IN_PROGRESS]);
 
             DB::commit();
 
         } catch (\Throwable $e) {
             DB::rollBack();
+
+            if ($path) {
+                $this->fileService->delete($path, PaymentProof::FILE_PATH);
+            }
 
             throw $e;
         }
