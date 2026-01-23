@@ -31,8 +31,12 @@ class CreateOrderAction
 
         $product = Product::where('code', $item->code)->firstOrFail();
 
-        if (!$product->activeDiscount) {
-            throw ValidationException::withMessages(['message' => ['Discount price is invalid. Product doesn\'t have discount']]);
+        if ($item->normalPrice != $product->price) {
+            throw ValidationException::withMessages(['message' => ['Normal price is invalid.']]);
+        }
+
+        if (!$product->is_discount) {
+            throw ValidationException::withMessages(['message' => ['Product doesn\'t have discount']]);
         }
 
         $this->validateProductPrice($item, $product);
@@ -84,28 +88,24 @@ class CreateOrderAction
      */
     protected function validateProductPrice(OrderItemDTO $item, Product $product): void
     {
-        if ($item->normalPrice != $product->price) {
-            throw ValidationException::withMessages(['message' => ['Normal price is invalid.']]);
+        $expectedDiscountPrice = $item->qty * $product->discount->amount;
+
+        if ($item->discountPrice != $expectedDiscountPrice) {
+            throw ValidationException::withMessages(['message' => ['Discount price is invalid.']]);
         }
 
         if ($item->totalPrice != ($item->qty * $product->price)) {
             throw ValidationException::withMessages(['message' => ['Total price is invalid.']]);
         }
 
-        if ($product->is_discount) {
-            if (
-                $item->discount->type !== $product->activeDiscount->type ||
-                $item->discount->amount != $product->activeDiscount->amount
-            ) {
-                throw ValidationException::withMessages(['message' => ['Discount is invalid.']]);
-            }
+        // cek data discount berdasarkan data di database
 
-            DiscountValidation::calculateFinalPrice($product, $item->discount);
-        }
-
-        $expectedDiscountPrice = $item->qty * ($item->normalPrice - $item->discount->finalPrice);
-        if ($item->discountPrice != $expectedDiscountPrice) {
-            throw ValidationException::withMessages(['message' => ['Discount price is invalid.']]);
+        if (
+            $item->discount->type !== $product->activeDiscount->type ||
+            $item->discount->amount != $product->activeDiscount->amount ||
+            $item->discount->finalPrice != $product->activeDiscount->final_price
+        ) {
+            throw ValidationException::withMessages(['message' => ['Discount is invalid.']]);
         }
 
         if ($item->finalPrice !== ($item->totalPrice - $item->discountPrice)) {

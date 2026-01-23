@@ -55,6 +55,7 @@ class OrderController extends Controller
             'orderItem.product',
             'orderItem.discount',
         ]);
+        dd($order);
 
         return new OrderResource($order);
     }
@@ -103,7 +104,7 @@ class OrderController extends Controller
             'reason' => ['nullable', 'string', 'max:100']
         ]);
 
-        $action->execute($order, PaymentStatus::DECLINED, $request->input('reason'));
+        $action->execute($order, PaymentStatus::DECLINED, $request->input('reason')); // 2 param ($order, array[status+reason])
 
         return new JsonResponse();
     }
