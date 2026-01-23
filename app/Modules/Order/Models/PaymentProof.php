@@ -9,10 +9,11 @@ use App\Modules\Order\Enums\PaymentStatus;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class PaymentProof extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     /** @var string */
     const FILE_PATH = 'paymentProof/';
@@ -23,6 +24,7 @@ class PaymentProof extends Model
         'status',
         'proof_link',
         'note',
+        'reason',
     ];
 
     protected $casts = [

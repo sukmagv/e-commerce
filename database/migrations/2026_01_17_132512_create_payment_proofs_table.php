@@ -18,7 +18,9 @@ return new class extends Migration
             $table->string('status');
             $table->string('proof_link');
             $table->string('note')->nullable();
+            $table->string('reason')->nullable();
             $table->timestamps();
+            $table->softDeletes('deleted_at');
         });
     }
 

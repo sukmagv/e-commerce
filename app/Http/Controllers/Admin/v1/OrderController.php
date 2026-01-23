@@ -97,9 +97,13 @@ class OrderController extends Controller
      * @param \App\Modules\Order\Models\Order $order
      * @return \Illuminate\Http\JsonResponse
      */
-    public function declineProof(Order $order, ChangeOrderStatusAction $action): JsonResponse
+    public function declineProof(Request $request, Order $order, ChangeOrderStatusAction $action): JsonResponse
     {
-        $action->execute($order, PaymentStatus::DECLINED);
+        $request->validate([
+            'reason' => ['nullable', 'string', 'max:100']
+        ]);
+
+        $action->execute($order, PaymentStatus::DECLINED, $request->input('reason'));
 
         return new JsonResponse();
     }
