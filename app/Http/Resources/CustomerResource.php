@@ -5,6 +5,10 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @see \App\Modules\Auth\Models\User
+ * @see \App\Modules\Auth\Models\Customer
+ */
 class CustomerResource extends JsonResource
 {
     /**

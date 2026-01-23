@@ -21,9 +21,7 @@ class OtpController extends Controller
      */
     public function sendOtp(OtpRequest $request, SendOtpAction $action): JsonResponse
     {
-        $dto = SendOtpDTO::fromRequest($request);
-
-        $action->execute($dto);
+        $action->execute($request->payload());
 
         return new JsonResponse();
     }

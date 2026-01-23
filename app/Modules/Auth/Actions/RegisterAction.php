@@ -27,8 +27,8 @@ class RegisterAction
         DB::beginTransaction();
         try {
             $user = User::create(array_merge(
+                $dto->toUserData(),
                 ['role_id' => User::customerRole()],
-                $dto->toArray()
             ));
 
             $customer = new Customer($dto->toCustomerData());
