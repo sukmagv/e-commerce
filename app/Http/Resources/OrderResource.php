@@ -5,6 +5,9 @@ namespace App\Http\Resources;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
+/**
+ * @see \App\Modules\Order\Models\Order
+ */
 class OrderResource extends JsonResource
 {
     /**

@@ -71,7 +71,6 @@ abstract class BaseDTO
         $result = [];
 
         foreach ($array as $key => $value) {
-            // Ubah categoryId menjadi category_id untuk Database
             $snakeKey = Str::snake($key);
 
             if ($value instanceof self) {

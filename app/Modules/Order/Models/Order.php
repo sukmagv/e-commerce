@@ -20,6 +20,8 @@ class Order extends Model
 {
     use HasFactory, HasCode, HasSearch, HasStatus, HasDateBetween, EnsureStatus;
 
+    const TAX = 11;
+
     protected $fillable = [
         'user_id',
         'status',

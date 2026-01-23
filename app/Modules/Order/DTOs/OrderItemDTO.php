@@ -7,11 +7,13 @@ use App\Supports\BaseDTO;
 
 class OrderItemDTO extends BaseDTO
 {
-    public string $code;
-    public int $qty;
-    public float $normalPrice;
-    public float $totalPrice;
-    public float $discountPrice;
-    public ?DiscountDTO $discount;
-    public float $finalPrice;
+    public function __construct(
+        public string $code,
+        public int $qty,
+        public float $normalPrice,
+        public float $totalPrice,
+        public float $discountPrice,
+        public ?DiscountDTO $discount,
+        public float $finalPrice,
+    ) {}
 }

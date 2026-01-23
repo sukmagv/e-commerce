@@ -11,16 +11,26 @@ use App\Modules\Product\Models\Product;
 use App\Modules\Order\Enums\OrderStatus;
 use function Symfony\Component\Clock\now;
 use App\Modules\Order\DTOs\CreateOrderDTO;
+use App\Modules\Order\DTOs\OrderItemDTO;
 use Illuminate\Validation\ValidationException;
 
 class CreateOrderAction
 {
     public function execute(CreateOrderDTO $dto): Order
     {
+        /** @var \App\Modules\Auth\Models\User $user */
+        $user = Auth::user();
+
+        $item = $dto->item;
+
+        $product = Product::where('code', $item->code)->firstOrFail();
+
+        $this->validateProductPrice($item, $product);
+
+        $this->validateOrderPrice($dto);
+
         DB::beginTransaction();
         try {
-            /** @var \App\Modules\Auth\Models\User $user */
-            $user = Auth::user();
 
             $order = Order::create(array_merge(
                 $dto->toArray(),
@@ -31,19 +41,13 @@ class CreateOrderAction
                 ]
             ));
 
-            $product = Product::where('code', $dto->item->code)->firstOrFail();
-
-            $this->validateProductPrice($dto, $product);
-
             $orderItem = new OrderItem(array_merge(
-                $dto->item->toArray(),
+                $item->toArray(),
                 [
                     'product_id' => $product->id,
-                    'discount_id' => $product->activeDiscount->id
+                    'discount_id' => $product->activeDiscount?->id
                 ]
             ));
-
-            $this->validateOrderPrice($dto);
 
             $order->update($dto->toArray());
 
@@ -65,42 +69,42 @@ class CreateOrderAction
     /**
      * Validate all product and discount price
      *
-     * @param \App\Modules\Order\DTOs\CreateOrderDTO $dto
+     * @param \App\Modules\Order\DTOs\OrderItemDTO $item
      * @param \App\Modules\Product\Models\Product $product
      * @return void
      */
-    protected function validateProductPrice(CreateOrderDTO $dto, Product $product): void
+    protected function validateProductPrice(OrderItemDTO $item, Product $product): void
     {
-        if ($dto->item->normalPrice != $product->price) {
+        if ($item->normalPrice != $product->price) {
             throw ValidationException::withMessages(['message' => ['Normal price is invalid.']]);
         }
 
-        if ($dto->item->totalPrice != ($dto->item->qty * $product->price)) {
+        if ($item->totalPrice != ($item->qty * $product->price)) {
             throw ValidationException::withMessages(['message' => ['Total price is invalid.']]);
         }
 
         if ($product->is_discount) {
             if (
-                $dto->item->discount->type !== $product->activeDiscount->type ||
-                $dto->item->discount->amount != $product->activeDiscount->amount
+                $item->discount->type !== $product->activeDiscount->type ||
+                $item->discount->amount != $product->activeDiscount->amount
             ) {
                 throw ValidationException::withMessages(['message' => ['Discount is invalid.']]);
             }
 
             DiscountValidation::calculateFinalPrice(
-                $dto->item->normalPrice,
-                $dto->item->discount->type,
-                $dto->item->discount->amount,
-                $dto->item->discount->finalPrice
+                $item->normalPrice,
+                $item->discount->type,
+                $item->discount->amount,
+                $item->discount->finalPrice
             );
         }
 
-        $expectedDiscountPrice = $dto->item->qty * ($dto->item->normalPrice - $dto->item->discount->finalPrice);
-        if ($dto->item->discountPrice != $expectedDiscountPrice) {
+        $expectedDiscountPrice = $item->qty * ($item->normalPrice - $item->discount->finalPrice);
+        if ($item->discountPrice != $expectedDiscountPrice) {
             throw ValidationException::withMessages(['message' => ['Discount price is invalid.']]);
         }
 
-        if ($dto->item->finalPrice !== ($dto->item->totalPrice - $dto->item->discountPrice)) {
+        if ($item->finalPrice !== ($item->totalPrice - $item->discountPrice)) {
             throw ValidationException::withMessages(['message' => ['Final price is invalid.']]);
         }
     }
@@ -113,7 +117,7 @@ class CreateOrderAction
      */
     protected function validateOrderPrice(CreateOrderDTO $dto): void
     {
-        $taxAmount = ($dto->item->finalPrice * 11) / 100; // bikin const di model
+        $taxAmount = ($dto->item->finalPrice * Order::TAX) / 100;
 
         if ($dto->subTotal != $dto->item->finalPrice) {
             throw ValidationException::withMessages(['message' => ['Sub total price is invalid.']]);
