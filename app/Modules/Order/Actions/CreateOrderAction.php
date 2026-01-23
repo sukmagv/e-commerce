@@ -16,6 +16,12 @@ use Illuminate\Validation\ValidationException;
 
 class CreateOrderAction
 {
+    /**
+     * Create order with product and discount data
+     *
+     * @param \App\Modules\Order\DTOs\CreateOrderDTO $dto
+     * @return \App\Modules\Order\Models\Order
+     */
     public function execute(CreateOrderDTO $dto): Order
     {
         /** @var \App\Modules\Auth\Models\User $user */
@@ -25,13 +31,16 @@ class CreateOrderAction
 
         $product = Product::where('code', $item->code)->firstOrFail();
 
+        if (!$product->activeDiscount) {
+            throw ValidationException::withMessages(['message' => ['Discount price is invalid. Product doesn\'t have discount']]);
+        }
+
         $this->validateProductPrice($item, $product);
 
         $this->validateOrderPrice($dto);
 
         DB::beginTransaction();
         try {
-
             $order = Order::create(array_merge(
                 $dto->toArray(),
                 [
@@ -91,12 +100,7 @@ class CreateOrderAction
                 throw ValidationException::withMessages(['message' => ['Discount is invalid.']]);
             }
 
-            DiscountValidation::calculateFinalPrice(
-                $item->normalPrice,
-                $item->discount->type,
-                $item->discount->amount,
-                $item->discount->finalPrice
-            );
+            DiscountValidation::calculateFinalPrice($product, $item->discount);
         }
 
         $expectedDiscountPrice = $item->qty * ($item->normalPrice - $item->discount->finalPrice);

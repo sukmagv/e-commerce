@@ -28,11 +28,11 @@ class OrderDetailResource extends JsonResource
             'normal_price'   => $this->normal_price,
             'total_price'    => $this->total_price,
             'discount_price' => $this->discount_price,
-            'discount'        => $this->discount ?? [
+            'discount'        => $this->discount ? [
                 'type'        => $this->discount->type,
                 'amount'      => $this->discount->amount,
                 'final_price' => $this->discount->final_price,
-            ],
+            ] : null,
             'final_price' => $this->final_price,
         ];
     }
