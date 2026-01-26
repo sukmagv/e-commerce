@@ -20,7 +20,7 @@ class Order extends Model
 {
     use HasFactory, HasCode, HasSearch, HasStatus, HasDateBetween, EnsureStatus;
 
-    const TAX = 11;
+    const TAX = 11 / 100;
 
     protected $fillable = [
         'user_id',
@@ -35,9 +35,9 @@ class Order extends Model
 
     protected $casts = [
         'status' => OrderStatus::class,
-        'sub_total' => 'integer',
-        'tax_amount' => 'integer',
-        'grand_total' => 'integer',
+        'sub_total' => 'float',
+        'tax_amount' => 'float',
+        'grand_total' => 'float',
         'transaction_date' => 'datetime',
     ];
 
@@ -54,5 +54,10 @@ class Order extends Model
     public function payment(): HasOne
     {
         return $this->hasOne(Payment::class);
+    }
+
+    public static function getTaxAmount(float $finalPrice): float
+    {
+        return ($finalPrice * self::TAX);
     }
 }

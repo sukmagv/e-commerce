@@ -12,7 +12,7 @@ class OrderItemDTO extends BaseDTO
         public int $qty,
         public float $normalPrice,
         public float $totalPrice,
-        public float $discountPrice,
+        public ?float $discountPrice,
         public ?DiscountDTO $discount,
         public float $finalPrice,
     ) {}

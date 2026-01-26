@@ -4,7 +4,6 @@ namespace App\Modules\Order\Actions;
 
 use Illuminate\Support\Facades\DB;
 use App\Modules\Order\Models\Order;
-use App\Supports\DiscountValidation;
 use Illuminate\Support\Facades\Auth;
 use App\Modules\Order\Models\OrderItem;
 use App\Modules\Product\Models\Product;
@@ -31,15 +30,21 @@ class CreateOrderAction
 
         $product = Product::where('code', $item->code)->firstOrFail();
 
-        if ($item->normalPrice != $product->price) {
-            throw ValidationException::withMessages(['message' => ['Normal price is invalid.']]);
+        if ($item->normalPrice != $product->price || $item->totalPrice != ($item->qty * $product->price)) {
+            throw ValidationException::withMessages(['message' => ['Invalid normal or total price.']]);
         }
 
-        if (!$product->is_discount) {
-            throw ValidationException::withMessages(['message' => ['Product doesn\'t have discount']]);
+        if ((bool) $item->discountPrice !== $product->is_discount) {
+            throw ValidationException::withMessages(['message' => ['Discount is invalid.']]);
         }
 
-        $this->validateProductPrice($item, $product);
+        if ($item->discountPrice && $product->is_discount){
+            $this->validateProductDiscountPrice($item, $product);
+        }
+
+        if ($item->finalPrice !== ($item->totalPrice - (float)$item->discountPrice)) {
+            throw ValidationException::withMessages(['message' => ['Final price is invalid.']]);
+        }
 
         $this->validateOrderPrice($dto);
 
@@ -80,36 +85,18 @@ class CreateOrderAction
     }
 
     /**
-     * Validate all product and discount price
+     * Validate discount price
      *
      * @param \App\Modules\Order\DTOs\OrderItemDTO $item
      * @param \App\Modules\Product\Models\Product $product
      * @return void
      */
-    protected function validateProductPrice(OrderItemDTO $item, Product $product): void
+    protected function validateProductDiscountPrice(OrderItemDTO $item, Product $product): void
     {
-        $expectedDiscountPrice = $item->qty * $product->discount->amount;
+        $expectedDiscountPrice = $item->qty * ($item->normalPrice - $product->activeDiscount->final_price);
 
-        if ($item->discountPrice != $expectedDiscountPrice) {
+        if ($item->discountPrice !== $expectedDiscountPrice) {
             throw ValidationException::withMessages(['message' => ['Discount price is invalid.']]);
-        }
-
-        if ($item->totalPrice != ($item->qty * $product->price)) {
-            throw ValidationException::withMessages(['message' => ['Total price is invalid.']]);
-        }
-
-        // cek data discount berdasarkan data di database
-
-        if (
-            $item->discount->type !== $product->activeDiscount->type ||
-            $item->discount->amount != $product->activeDiscount->amount ||
-            $item->discount->finalPrice != $product->activeDiscount->final_price
-        ) {
-            throw ValidationException::withMessages(['message' => ['Discount is invalid.']]);
-        }
-
-        if ($item->finalPrice !== ($item->totalPrice - $item->discountPrice)) {
-            throw ValidationException::withMessages(['message' => ['Final price is invalid.']]);
         }
     }
 
@@ -121,18 +108,16 @@ class CreateOrderAction
      */
     protected function validateOrderPrice(CreateOrderDTO $dto): void
     {
-        $taxAmount = ($dto->item->finalPrice * Order::TAX) / 100;
+        $taxAmount = Order::getTaxAmount($dto->subTotal);
 
-        if ($dto->subTotal != $dto->item->finalPrice) {
-            throw ValidationException::withMessages(['message' => ['Sub total price is invalid.']]);
-        }
+        $isInvalid = ($dto->subTotal !== $dto->item->finalPrice) ||
+                    ($dto->taxAmount !== $taxAmount) ||
+                    ($dto->grandTotal !== ($dto->subTotal + $taxAmount));
 
-        if ($dto->taxAmount != $taxAmount) {
-            throw ValidationException::withMessages(['message' => ['Tax amount is invalid.' . $taxAmount]]);
-        }
-
-        if ($dto->grandTotal != $dto->subTotal + $taxAmount) {
-            throw ValidationException::withMessages(['message' => ['Grand total price is invalid.']]);
+        if ($isInvalid) {
+            throw ValidationException::withMessages([
+                'message' => ['Price calculation mismatch. Check subtotal, tax, and grand total.']
+            ]);
         }
     }
 }
