@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Modules\Auth\Models\User;
 use Closure;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
@@ -17,10 +18,9 @@ class RoleMiddleware
     {
         $user = $request->user();
 
-        if (!$user || !in_array($user->role->slug, $roles)) {
-            abort(Response::HTTP_UNAUTHORIZED, 'Unauthorized');
+        if ($user instanceof User && in_array($user->role->slug, $roles)) {
+            return $next($request);
         }
-
-        return $next($request);
+        abort(Response::HTTP_UNAUTHORIZED, 'Unauthorized');
     }
 }
