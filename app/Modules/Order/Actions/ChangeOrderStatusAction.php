@@ -14,27 +14,32 @@ class ChangeOrderStatusAction
     public function __construct(protected FileService $fileService)
     {}
 
-    public function execute(Order $order, PaymentStatus $paymentStatus, ?string $reason = null): Order
+    /**
+     * Change payment proof and order status
+     *
+     * @param \App\Modules\Order\Models\Order $order
+     * @param array $paymentData
+     * @return \App\Modules\Order\Models\Order
+     */
+    public function execute(Order $order, array $paymentData): Order
     {
         $order->ensureStatus(OrderStatus::IN_PROGRESS->value);
 
         $latestProof = $order->payment->latestProof;
 
-        $isDeclined = $paymentStatus === PaymentStatus::DECLINED;
+        $isDeclined = $paymentData['status'] === PaymentStatus::DECLINED;
 
         DB::beginTransaction();
         try {
-            $proofUpdate = ['status' => $paymentStatus];
 
-            if ($reason && $isDeclined) {
-                $proofUpdate['reason'] = $reason;
-                $latestProof->delete();
+            if ($isDeclined) {
+                $latestProof->update($paymentData);
             }
 
-            $latestProof->update($proofUpdate);
+            $latestProof->update($paymentData['status']);
 
             $order->update([
-                'status' => $paymentStatus->getRelatedOrderStatus(),
+                'status' => $paymentData['status']->getRelatedOrderStatus(),
             ]);
 
             DB::commit();
@@ -43,11 +48,6 @@ class ChangeOrderStatusAction
             DB::rollBack();
 
             throw $e;
-        }
-
-        if ($isDeclined) {
-            $fileName = $latestProof->getRawOriginal('proof_link');
-            $this->fileService->delete($fileName, PaymentProof::FILE_PATH);
         }
 
         return $order;

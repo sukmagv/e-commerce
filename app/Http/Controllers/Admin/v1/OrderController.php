@@ -55,7 +55,6 @@ class OrderController extends Controller
             'orderItem.product',
             'orderItem.discount',
         ]);
-        dd($order);
 
         return new OrderResource($order);
     }
@@ -87,7 +86,9 @@ class OrderController extends Controller
      */
     public function acceptProof(Order $order, ChangeOrderStatusAction $action): JsonResponse
     {
-        $action->execute($order, PaymentStatus::ACCEPTED);
+        $action->execute($order, [
+            'status' => PaymentStatus::ACCEPTED
+        ]);
 
         return new JsonResponse();
     }
@@ -104,7 +105,10 @@ class OrderController extends Controller
             'reason' => ['nullable', 'string', 'max:100']
         ]);
 
-        $action->execute($order, PaymentStatus::DECLINED, $request->input('reason')); // 2 param ($order, array[status+reason])
+        $action->execute($order, [
+            'status' => PaymentStatus::DECLINED,
+            'reason' => $request->input('reason'),
+        ]);
 
         return new JsonResponse();
     }
