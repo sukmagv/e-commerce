@@ -28,9 +28,9 @@ class OrderItem extends Model
 
     protected $casts = [
         'qty' => 'integer',
-        'normal_price' => 'integer',
-        'discount_price' => 'integer',
-        'final_price' => 'integer',
+        'normal_price' => 'float',
+        'discount_price' => 'float',
+        'final_price' => 'float',
     ];
 
     public function order(): BelongsTo

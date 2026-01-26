@@ -16,9 +16,9 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->string('status');
             $table->string('code')->unique();
-            $table->unsignedBigInteger('sub_total');
-            $table->unsignedBigInteger('tax_amount');
-            $table->unsignedBigInteger('grand_total');
+            $table->float('sub_total');
+            $table->float('tax_amount');
+            $table->float('grand_total');
             $table->string('note')->nullable();
             $table->timestamp('transaction_date')->nullable();
             $table->timestamps();

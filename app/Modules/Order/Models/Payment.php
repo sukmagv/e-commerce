@@ -17,6 +17,10 @@ class Payment extends Model
         'amount',
     ];
 
+    protected $casts = [
+        'amount' => 'float',
+    ];
+
     public function order(): HasOne
     {
         return $this->hasOne(Order::class);

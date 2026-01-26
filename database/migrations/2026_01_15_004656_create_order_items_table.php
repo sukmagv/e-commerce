@@ -17,10 +17,10 @@ return new class extends Migration
             $table->foreignId('product_id')->constrained();
             $table->foreignId('discount_id')->nullable()->constrained('product_discounts');
             $table->unsignedInteger('qty');
-            $table->unsignedBigInteger('normal_price');
-            $table->unsignedBigInteger('total_price');
-            $table->unsignedBigInteger('discount_price');
-            $table->unsignedBigInteger('final_price');
+            $table->float('normal_price');
+            $table->float('total_price');
+            $table->float('discount_price')->default(0);
+            $table->float('final_price');
             $table->timestamps();
         });
     }
