@@ -27,6 +27,8 @@ class UploadPaymentProofAction
     {
         $payment = Payment::where('order_id', $order->id)->first();
 
+        $oldProof = $payment->proof?->proof_link;
+
         DB::beginTransaction();
         try {
             if (!$payment) {
@@ -36,19 +38,19 @@ class UploadPaymentProofAction
                 ]);
             }
 
-            $paymentProof = new PaymentProof(array_merge(
+            $proofData = array_merge(
                 $dto->toArray(),
                 ['status' => PaymentStatus::PENDING],
-                ));
+            );
 
             if ($dto->proofLink) {
-                $path = $this->fileService->updateOrCreate($dto->proofLink, null, PaymentProof::FILE_PATH);
-                $paymentProof->proof_link = $path;
+                $proofData['proof_link'] = $this->fileService->updateOrCreate($dto->proofLink, $oldProof, PaymentProof::FILE_PATH);
             }
 
-            $paymentProof->payment()->associate($payment);
-
-            $paymentProof->save();
+            $paymentProof = PaymentProof::updateOrCreate(
+                ['payment_id' => $payment->id],
+                $proofData
+            );
 
             $order->update(['status' => OrderStatus::IN_PROGRESS]);
 
@@ -56,10 +58,6 @@ class UploadPaymentProofAction
 
         } catch (\Throwable $e) {
             DB::rollBack();
-
-            if ($path) {
-                $this->fileService->delete($path, PaymentProof::FILE_PATH);
-            }
 
             throw $e;
         }

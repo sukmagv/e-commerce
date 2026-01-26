@@ -26,18 +26,8 @@ class Payment extends Model
         return $this->hasOne(Order::class);
     }
 
-    public function proof(): HasMany
+    public function proof(): HasOne
     {
-        return $this->hasMany(PaymentProof::class);
-    }
-
-    /**
-     * Get latest payment proof
-     *
-     * @return \Illuminate\Database\Eloquent\Relations\HasOne
-     */
-    public function latestProof(): HasOne
-    {
-        return $this->hasOne(PaymentProof::class)->latestOfMany();
+        return $this->hasOne(PaymentProof::class);
     }
 }

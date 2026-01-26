@@ -27,7 +27,7 @@ class FileService
         $file->storeAs($folder, $filename, $disk);
 
         if ($oldFilename) {
-            $this->delete($oldFilename, $folder, $disk);
+            $this->delete($oldFilename, $disk);
         }
 
         return $filename;
@@ -40,9 +40,9 @@ class FileService
      * @param string $disk
      * @return void
      */
-    public function delete(string $filename, string $folder, string $disk = 'public'): void
+    public function delete(string $filename, string $disk): void
     {
-        $path = $folder . '/' . $filename;
+        $path = str_replace(url('/storage') . '/', '', $filename);
 
         if (Storage::disk($disk)->exists($path)) {
             Storage::disk($disk)->delete($path);
