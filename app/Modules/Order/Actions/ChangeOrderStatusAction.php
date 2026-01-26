@@ -23,20 +23,14 @@ class ChangeOrderStatusAction
      */
     public function execute(Order $order, array $paymentData): Order
     {
-        $order->ensureStatus(OrderStatus::IN_PROGRESS->value);
-
-        $latestProof = $order->payment->latestProof;
-
-        $isDeclined = $paymentData['status'] === PaymentStatus::DECLINED;
+        $proof = $order->payment->proof;
 
         DB::beginTransaction();
         try {
-
-            if ($isDeclined) {
-                $latestProof->update($paymentData);
-            }
-
-            $latestProof->update($paymentData['status']);
+            $proof->update([
+                'status' => $paymentData['status'],
+                'reason' => $paymentData['reason'] ?? null,
+            ]);
 
             $order->update([
                 'status' => $paymentData['status']->getRelatedOrderStatus(),
