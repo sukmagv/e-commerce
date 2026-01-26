@@ -1,12 +1,12 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Customer\v1\OtpController;
-use App\Http\Controllers\Customer\v1\AuthController;
-use App\Http\Controllers\Customer\v1\BankController;
-use App\Http\Controllers\Customer\v1\OrderController;
-use App\Http\Controllers\Customer\v1\ProductController;
-use App\Http\Controllers\Customer\v1\ProfileController;
+use App\Http\Controllers\Api\Customer\V1\OtpController;
+use App\Http\Controllers\Api\Customer\V1\AuthController;
+use App\Http\Controllers\Api\Customer\V1\BankController;
+use App\Http\Controllers\Api\Customer\V1\OrderController;
+use App\Http\Controllers\Api\Customer\V1\ProductController;
+use App\Http\Controllers\Api\Customer\V1\ProfileController;
 
 Route::post('otp/send', [OtpController::class, 'sendOtp']);
 Route::post('otp/verify', [OtpController::class, 'verifyOtp']);

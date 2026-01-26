@@ -1,11 +1,11 @@
 <?php
 
-use App\Http\Controllers\Admin\v1\AuthController;
-use App\Http\Controllers\Admin\v1\CustomerController;
-use App\Http\Controllers\Admin\v1\OrderController;
-use App\Http\Controllers\Admin\v1\ProductCategoryController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Admin\v1\ProductController;
+use App\Http\Controllers\Api\Admin\v1\AuthController;
+use App\Http\Controllers\Api\Admin\V1\OrderController;
+use App\Http\Controllers\Api\Admin\V1\ProductController;
+use App\Http\Controllers\Api\Admin\V1\CustomerController;
+use App\Http\Controllers\Api\Admin\V1\ProductCategoryController;
 
 Route::post('/login', [AuthController::class, 'login']);
 

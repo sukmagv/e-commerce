@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Observers\OrderObserver;
 use Illuminate\Support\Facades\DB;
 use App\Modules\Order\Models\Order;
 use Illuminate\Support\Facades\Log;
@@ -10,7 +11,6 @@ use Illuminate\Support\Facades\Route;
 use App\Modules\Product\Models\Product;
 use Illuminate\Support\ServiceProvider;
 use App\Modules\Product\Models\ProductCategory;
-use App\Supports\OrderObserver;
 
 class AppServiceProvider extends ServiceProvider
 {

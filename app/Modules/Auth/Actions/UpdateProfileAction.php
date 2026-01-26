@@ -8,7 +8,6 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\Modules\Auth\DTOs\UpdateProfileDTO;
-use App\Http\Requests\Customer\v1\UpdateProfileRequest;
 
 class UpdateProfileAction
 {
@@ -19,7 +18,7 @@ class UpdateProfileAction
      * Update one or more customer profile
      *
      * @param \App\Modules\Auth\Models\User $user
-     * @param \App\Http\Requests\Customer\v1\UpdateProfileRequest $request
+     * @param \App\Http\Requests\Api\Customer\V1\UpdateProfileRequest $request
      * @return \App\Modules\Auth\Models\User
      */
     public function execute(UpdateProfileDTO $dto): User
