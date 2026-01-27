@@ -21,6 +21,7 @@ return new class extends Migration
             $table->float('total_price');
             $table->float('discount_price')->nullable();
             $table->float('final_price');
+            $table->json('product_snapshot');
             $table->timestamps();
         });
     }
