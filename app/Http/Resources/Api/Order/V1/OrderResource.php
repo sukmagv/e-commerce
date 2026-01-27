@@ -25,7 +25,7 @@ class OrderResource extends JsonResource
             'tax_amount'  => $this->tax_amount,
             'grand_total' => $this->grand_total,
             'status'      => $this->status,
-            'proof_link'  => $this->payment?->latestProof->proof_link,
+            'proof_link'  => $this->payment?->proof->proof_link,
             'updated_at'  => $this->created_at,
 
             'item' => OrderDetailResource::make($this->whenLoaded('orderItem')),

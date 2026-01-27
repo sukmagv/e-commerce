@@ -43,7 +43,7 @@ class OrderController extends Controller
         $user = Auth::user();
 
         $orders = Order::query()
-            ->with(['user:id,name', 'payment.latestProof'])
+            ->with(['user:id,name', 'payment.proof'])
             ->where('user_id', $user->id)
             ->search($request->input('search'))
             ->status($request->input('status'))
@@ -78,7 +78,7 @@ class OrderController extends Controller
     {
         $order->loadMissing([
             'user:id,name',
-            'payment.latestProof',
+            'payment.proof',
             'orderItem.product',
             'orderItem.discount',
         ]);
@@ -115,7 +115,7 @@ class OrderController extends Controller
 
         $order->loadMissing([
             'user:id,name',
-            'payment.latestProof',
+            'payment.proof',
             'orderItem.product',
             'orderItem.discount',
         ]);

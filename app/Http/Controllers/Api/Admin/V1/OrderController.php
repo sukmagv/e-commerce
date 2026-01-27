@@ -31,7 +31,7 @@ class OrderController extends Controller
             'limit'      => ['sometimes', 'numeric']
         ]);
 
-        $orders = Order::with(['user', 'payment.latestProof'])
+        $orders = Order::with(['user', 'payment.proof'])
             ->search($request->query('search'))
             ->status($request->query('status'))
             ->latest()
@@ -50,7 +50,7 @@ class OrderController extends Controller
     {
         $order->loadMissing([
             'user:id,name',
-            'payment.latestProof',
+            'payment.proof',
             'orderItem.product',
             'orderItem.discount',
         ]);
@@ -68,7 +68,7 @@ class OrderController extends Controller
     {
         $order->loadMissing(['payment.proof']);
 
-        $proofData = $order->payment->latestProof;
+        $proofData = $order->payment->proof;
 
         return new JsonResource([
             'type'       => $proofData->type,

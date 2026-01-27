@@ -27,7 +27,7 @@ class UploadPaymentProofAction
     {
         $payment = Payment::where('order_id', $order->id)->first();
 
-        $oldProof = $payment->proof?->proof_link;
+        $oldProof = $payment?->proof?->proof_link;
 
         DB::beginTransaction();
         try {
