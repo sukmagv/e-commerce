@@ -11,14 +11,14 @@ class FileService
      * Save uploaded photo and automatically delete the old one if it exists.
      *
      * @param UploadedFile|null $file
-     * @param string|null $oldPath
+     * @param string|null $oldFilename
      * @param string $folder
      * @param string $disk
      * @return string|null
      */
     public function updateOrCreate(?UploadedFile $file, ?string $oldFilename = null, string $folder = 'uploads', string $disk = 'public'): ?string
     {
-        if (!$file) {
+        if (! $file) {
             return $oldFilename;
         }
 
@@ -40,9 +40,9 @@ class FileService
      * @param string $disk
      * @return void
      */
-    public function delete(string $filename, string $disk): void
+    public function delete(string $filename, string $disk = 'public'): void
     {
-        $path = str_replace(url('/storage') . '/', '', $filename);
+        $path = str_replace(url('/storage').'/', '', $filename);
 
         if (Storage::disk($disk)->exists($path)) {
             Storage::disk($disk)->delete($path);

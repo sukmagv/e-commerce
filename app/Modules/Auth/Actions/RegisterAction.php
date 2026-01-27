@@ -2,16 +2,15 @@
 
 namespace App\Modules\Auth\Actions;
 
-use App\Services\FileService;
-use App\Modules\Auth\Models\User;
-use Illuminate\Support\Facades\DB;
-use App\Modules\Auth\Models\Customer;
 use App\Modules\Auth\DTOs\CustomerRegisterDTO;
+use App\Modules\Auth\Models\Customer;
+use App\Modules\Auth\Models\User;
+use App\Services\FileService;
+use Illuminate\Support\Facades\DB;
 
 class RegisterAction
 {
-    public function __construct(protected FileService $fileService)
-    {}
+    public function __construct(protected FileService $fileService) {}
 
     /**
      * Check email already verified or not
@@ -34,7 +33,7 @@ class RegisterAction
             $customer = new Customer($dto->toCustomerData());
 
             if ($dto->photo) {
-                $path = $this->fileService->updateOrCreate($dto->photo, null, 'profile');
+                $path = $this->fileService->updateOrCreate($dto->photo, null, Customer::IMAGE_PATH);
                 $customer->photo = $path;
             }
 
@@ -51,7 +50,7 @@ class RegisterAction
             DB::rollBack();
 
             if ($path) {
-                $this->fileService->delete($path, 'profile');
+                $this->fileService->delete($path);
             }
 
             throw $e;

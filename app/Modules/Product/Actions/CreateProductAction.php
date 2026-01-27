@@ -2,18 +2,17 @@
 
 namespace App\Modules\Product\Actions;
 
-use App\Services\FileService;
-use Illuminate\Support\Facades\DB;
-use App\Modules\Product\Models\Product;
 use App\Modules\Product\DTOs\CreateProductDTO;
+use App\Modules\Product\Models\Product;
 use App\Modules\Product\Models\ProductDiscount;
+use App\Services\FileService;
 use App\Supports\DiscountValidation;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
 
 class CreateProductAction
 {
-    public function __construct(protected FileService $fileService)
-    {}
+    public function __construct(protected FileService $fileService) {}
 
     /**
      * Create new product data
@@ -30,7 +29,7 @@ class CreateProductAction
             $product = new Product($dto->toArray());
 
             if ($dto->photo instanceof UploadedFile) {
-                $path = $this->fileService->updateOrCreate($dto->photo, null, 'products');
+                $path = $this->fileService->updateOrCreate($dto->photo, null, Product::IMAGE_PATH);
                 $product->photo = $path;
             }
 
@@ -52,7 +51,7 @@ class CreateProductAction
             DB::rollBack();
 
             if ($path) {
-                $this->fileService->delete($path, 'product');
+                $this->fileService->delete($path);
             }
 
             throw $e;
