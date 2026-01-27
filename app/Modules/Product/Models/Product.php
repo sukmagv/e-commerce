@@ -39,7 +39,7 @@ class Product extends Model
     ];
 
     /** @var string */
-    const IMAGE_PATH = 'product/';
+    const IMAGE_PATH = 'products/';
 
     protected const SNAPSHOT_FIELDS = [
         'code',

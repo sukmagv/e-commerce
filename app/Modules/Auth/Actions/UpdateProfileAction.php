@@ -3,6 +3,7 @@
 namespace App\Modules\Auth\Actions;
 
 use App\Modules\Auth\DTOs\UpdateProfileDTO;
+use App\Modules\Auth\Models\Customer;
 use App\Modules\Auth\Models\User;
 use App\Services\FileService;
 use Illuminate\Http\UploadedFile;
@@ -37,7 +38,7 @@ class UpdateProfileAction
             $oldPath = $user->customer?->photo;
 
             if ($dto->photo && $dto->photo instanceof UploadedFile) {
-                $customerData['photo'] = $this->fileService->updateOrCreate($dto->photo, $oldPath, 'profile');
+                $customerData['photo'] = $this->fileService->updateOrCreate($dto->photo, $oldPath, Customer::IMAGE_PATH);
             }
 
             if ($user->customer && ! empty($customerData)) {

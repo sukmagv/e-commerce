@@ -18,7 +18,7 @@ class Customer extends Model
     use HasApiTokens, HasFactory, Notifiable, HasUser, HasCode;
 
     /** @var string */
-    const IMAGE_PATH = 'customer/';
+    const IMAGE_PATH = 'profiles/';
 
     protected $fillable = [
         'user_id',
