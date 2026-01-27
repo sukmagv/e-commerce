@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests\Api\Customer\V1;
 
-use App\Rules\V1\VerifiedOtp;
+use App\Rules\VerifiedOtp;
 use App\Modules\Auth\DTOs\ResetPasswordDTO;
 use Illuminate\Foundation\Http\FormRequest;
 

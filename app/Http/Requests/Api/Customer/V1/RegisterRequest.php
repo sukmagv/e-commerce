@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests\Api\Customer\V1;
 
-use App\Rules\V1\VerifiedOtp;
+use App\Rules\VerifiedOtp;
 use Illuminate\Foundation\Http\FormRequest;
 use App\Modules\Auth\DTOs\CustomerRegisterDTO;
 
