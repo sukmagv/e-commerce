@@ -3,18 +3,18 @@
 namespace App\Exports;
 
 use App\Modules\Order\Models\Order;
+use Maatwebsite\Excel\Concerns\FromQuery;
 use Maatwebsite\Excel\Concerns\WithStyles;
 use Maatwebsite\Excel\Concerns\WithMapping;
 use Maatwebsite\Excel\Concerns\WithHeadings;
-use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\WithChunkReading;
 use Maatwebsite\Excel\Concerns\WithColumnWidths;
-use Maatwebsite\Excel\Concerns\WithColumnFormatting;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
+use Maatwebsite\Excel\Concerns\WithColumnFormatting;
 
 class OrderExcelReport implements
-    FromCollection,
+    FromQuery,
     WithHeadings,
     WithMapping,
     WithColumnWidths,
@@ -22,20 +22,17 @@ class OrderExcelReport implements
     WithChunkReading,
     WithColumnFormatting
 {
-    /**
-    * @return \Illuminate\Support\Collection
-    */
-    public function collection()
+    public function query()
     {
         return Order::with([
                 'user',
-                'payment.latestProof',
+                'payment.proof',
                 'orderItem.product',
                 'orderItem.discount'
             ])
-            ->when($this->status, fn($q) => $q->where('status', $this->status))
-            ->when($this->startDate, fn($q) => $q->whereDate('created_at', '>=', $this->startDate))
-            ->when($this->endDate, fn($q) => $q->whereDate('created_at', '<=', $this->endDate));
+            ->when($this->status, fn ($q) => $q->where('status', $this->status))
+            ->when($this->startDate, fn ($q) => $q->whereDate('created_at', '>=', $this->startDate))
+            ->when($this->endDate, fn ($q) => $q->whereDate('created_at', '<=', $this->endDate));
     }
 
     protected ?string $status;
@@ -68,7 +65,7 @@ class OrderExcelReport implements
             $order->user->name,
             $order->orderItem?->product?->name ?? '-',
             $order->grand_total,
-            $order->payment?->latestProof->status->value ?? 'N/A',
+            $order->payment?->proof->status->value ?? 'N/A',
             $order->created_at->format('Y-m-d'),
         ];
     }
