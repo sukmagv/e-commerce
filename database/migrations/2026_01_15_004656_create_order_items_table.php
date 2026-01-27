@@ -19,7 +19,7 @@ return new class extends Migration
             $table->unsignedInteger('qty');
             $table->float('normal_price');
             $table->float('total_price');
-            $table->float('discount_price')->default(0);
+            $table->float('discount_price')->nullable();
             $table->float('final_price');
             $table->timestamps();
         });
