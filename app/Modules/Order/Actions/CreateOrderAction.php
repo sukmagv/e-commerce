@@ -2,16 +2,15 @@
 
 namespace App\Modules\Order\Actions;
 
-use App\Modules\Order\DTOs\CreateOrderDTO;
+use Illuminate\Support\Facades\DB;
+use App\Modules\Order\Models\Order;
+use Illuminate\Support\Facades\Auth;
+use App\Modules\Product\Models\Product;
 use App\Modules\Order\DTOs\OrderItemDTO;
 use App\Modules\Order\Enums\OrderStatus;
-use App\Modules\Order\Models\Order;
-use App\Modules\Product\Models\Product;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Validation\ValidationException;
-
 use function Symfony\Component\Clock\now;
+use App\Modules\Order\DTOs\CreateOrderDTO;
+use Illuminate\Validation\ValidationException;
 
 class CreateOrderAction
 {
@@ -59,6 +58,7 @@ class CreateOrderAction
             $order->orderItem()->create(array_merge($item->toArray(), [
                 'product_id' => $product->id,
                 'discount_id' => $product->activeDiscount?->id,
+                'product_snapshot' => $product->snapshot(),
             ]));
 
             DB::commit();

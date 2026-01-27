@@ -4,12 +4,9 @@ namespace App\Modules\Order\Models;
 
 use App\Modules\Product\Models\Product;
 use App\Modules\Product\Models\ProductDiscount;
-use App\Supports\HasCode;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasOne;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class OrderItem extends Model
 {
@@ -24,6 +21,7 @@ class OrderItem extends Model
         'total_price',
         'discount_price',
         'final_price',
+        'product_snapshot',
     ];
 
     protected $casts = [
@@ -31,6 +29,7 @@ class OrderItem extends Model
         'normal_price' => 'float',
         'discount_price' => 'float',
         'final_price' => 'float',
+        'product_snapshot' => 'array',
     ];
 
     public function order(): BelongsTo

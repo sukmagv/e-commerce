@@ -5,6 +5,7 @@ namespace App\Modules\Product\Models;
 use App\Supports\HasCode;
 use App\Supports\HasSlug;
 use App\Supports\HasSearch;
+use Illuminate\Support\Arr;
 use App\Modules\Order\Models\OrderItem;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
@@ -19,9 +20,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class Product extends Model
 {
     use HasFactory, HasCode, SoftDeletes, HasSlug, HasSearch;
-
-    /** @var string */
-    const IMAGE_PATH = 'product/';
 
     protected $fillable = [
         'category_id',
@@ -38,6 +36,18 @@ class Product extends Model
         'price' => 'float',
         'is_discount' => 'boolean',
         'is_active' => 'boolean',
+    ];
+
+    /** @var string */
+    const IMAGE_PATH = 'product/';
+
+    protected const SNAPSHOT_FIELDS = [
+        'code',
+        'category_id',
+        'slug',
+        'name',
+        'photo',
+        'price',
     ];
 
     public function category(): BelongsTo
@@ -82,5 +92,15 @@ class Product extends Model
     public function scopeActive(Builder $query): Builder
     {
         return $query->where('is_active', true);
+    }
+
+    /**
+     * Get selected product snapshot fields
+     *
+     * @return array
+     */
+    public function snapshot(): array
+    {
+        return Arr::only($this->toArray(),self::SNAPSHOT_FIELDS);
     }
 }

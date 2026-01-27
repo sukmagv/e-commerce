@@ -19,10 +19,9 @@ class OrderDetailResource extends JsonResource
     {
         return [
             'product'   => [
-                'code'  => $this->product->code,
-                'name'  => $this->product->name,
-                'photo' => $this->product->photo,
-                'price' => $this->product->price,
+                'code'  => $this->product_snapshot['code'],
+                'name'  => $this->product_snapshot['name'],
+                'photo' => $this->product_snapshot['photo'],
             ],
             'qty'            => $this->qty,
             'normal_price'   => $this->normal_price,
