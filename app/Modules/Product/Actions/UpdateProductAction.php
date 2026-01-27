@@ -2,17 +2,16 @@
 
 namespace App\Modules\Product\Actions;
 
-use App\Services\FileService;
-use Illuminate\Support\Facades\DB;
-use App\Supports\DiscountValidation;
-use App\Modules\Product\Models\Product;
 use App\Modules\Product\DTOs\UpdateProductDTO;
+use App\Modules\Product\Models\Product;
 use App\Modules\Product\Models\ProductDiscount;
+use App\Services\FileService;
+use App\Supports\DiscountValidation;
+use Illuminate\Support\Facades\DB;
 
 class UpdateProductAction
 {
-    public function __construct(protected FileService $fileService)
-    {}
+    public function __construct(protected FileService $fileService) {}
 
     /**
      * Update product data
@@ -26,32 +25,19 @@ class UpdateProductAction
     {
         $path = null;
 
-        // Check product already used in order or not
-        $isUsedInOrder = $product->orderItems()->exists();
-
         $oldPath = $product->photo;
+
+        $updateData = $dto->toArray();
+
+        $updateData = array_filter($updateData, fn ($value) => ! is_null($value));
 
         DB::beginTransaction();
         try {
-
-            if ($isUsedInOrder) {
-                $newProduct = $this->replicateWithPhoto($product, $dto, $oldPath);
-
-                $newProduct->save();
-
-                $product->delete();
-
-            } else {
-                $updateData = $dto->toArray();
-
-                $updateData = array_filter($updateData, fn($value) => !is_null($value));
-
-                if (isset($dto->photo) && $dto->photo) {
-                    $updateData['photo'] = $this->fileService->updateOrCreate($dto->photo, $oldPath, 'products');
-                }
-
-                $product->update($updateData);
+            if (isset($dto->photo) && $dto->photo) {
+                $updateData['photo'] = $this->fileService->updateOrCreate($dto->photo, $oldPath, Product::IMAGE_PATH);
             }
+
+            $product->update($updateData);
 
             if (isset($dto->isDiscount) && $dto->isDiscount) {
                 $discount = $this->applyDiscount($product, $dto);
@@ -67,7 +53,7 @@ class UpdateProductAction
             DB::rollBack();
 
             if ($path) {
-                $this->fileService->delete($path, 'product');
+                $this->fileService->delete($path);
             }
 
             throw $e;
@@ -99,10 +85,12 @@ class UpdateProductAction
         } else {
             $newProduct->photo = $oldPath;
         }
-            $newProduct->fill(array_filter(
-                $dto->toArray(),
-                function ($value) {return !is_null($value);}
-            ));
+        $newProduct->fill(array_filter(
+            $dto->toArray(),
+            function ($value) {
+                return ! is_null($value);
+            }
+        ));
 
         return $newProduct;
     }
