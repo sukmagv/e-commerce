@@ -100,7 +100,7 @@ class UpdateProductAction
      */
     protected function applyDiscount(Product $product, UpdateProductDTO $dto): ProductDiscount
     {
-        DiscountValidation::calculateFinalPrice($product, $dto->discount);
+        DiscountValidation::calculateFinalPrice($product->price, $dto->discount);
 
         $discount = new ProductDiscount($dto->discount->toArray());
 

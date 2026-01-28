@@ -36,7 +36,7 @@ class CreateProductAction
             $product->save();
 
             if ($dto->isDiscount) {
-                DiscountValidation::calculateFinalPrice($product, $dto->discount);
+                DiscountValidation::calculateFinalPrice($product->price, $dto->discount);
 
                 $discount = new ProductDiscount($dto->discount->toArray());
 
