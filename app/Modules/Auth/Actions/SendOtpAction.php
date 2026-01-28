@@ -41,6 +41,7 @@ class SendOtpAction
         if ($otp) {
             $otp->update([
                 'code'       => $hashedCode,
+                'verified_at' => null,
                 'expired_at' => $expiredAt,
                 'attempt'    => 0,
             ]);
