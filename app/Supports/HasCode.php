@@ -3,6 +3,7 @@
 namespace App\Supports;
 
 use Illuminate\Support\Carbon;
+use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 trait HasCode
@@ -29,16 +30,33 @@ trait HasCode
      */
     protected static function bootHasCode()
     {
-        static::creating(function ($model) {
-            if (!empty($model->code)) {
-                return;
-            }
+        static::creating(fn ($model) => static::setCodeIfEmpty($model));
+        static::created(fn ($model) => static::finalizeCode($model));
+    }
 
-            $modelName = class_basename($model);
-            $prefix = static::codePrefixes()[$modelName] ?? '';
+    protected static function setCodeIfEmpty($model): void
+    {
+        if (!empty($model->code)) {
+            return;
+        }
 
-            $model->code = static::generateCode($prefix);
-        });
+        $model->code = static::buildCode($model);
+    }
+
+    protected static function finalizeCode($model): void
+    {
+        if (str_contains($model->code, '-000-')) {
+            $model->updateQuietly([
+                'code' => static::buildCode($model),
+            ]);
+        }
+    }
+
+    protected static function buildCode($model): string
+    {
+        $prefix = static::codePrefixes()[class_basename($model)] ?? '';
+
+        return static::generateCode($prefix, $model);
     }
 
     /**
@@ -47,34 +65,14 @@ trait HasCode
      * @param string $prefix
      * @return string
      */
-    protected static function generateCode(string $prefix): string
+    protected static function generateCode(string $prefix, Model $model): string
     {
-        $date = Carbon::now()->format('Ymd');
-
-        $query = static::query();
-
-        // pakai withTrashed jika model pakai SoftDeletes
-        if (in_array(SoftDeletes::class, class_uses_recursive(static::class))) {
-            $query->withTrashed();
-        }
-
-        $last = $query
-            ->whereDate('created_at', Carbon::today())
-            ->where('code', 'like', $prefix . '-%')
-            ->latest('id')
-            ->first();
-
-        $lastNumber = 0;
-
-        if ($last?->code) {
-            $parts = explode('-', $last->code);
-            $lastNumber = (int) ($parts[1] ?? 0);
-        }
+        $date = Carbon::now()->format('dmy');
 
         return sprintf(
             '%s-%03d-%s',
             $prefix,
-            $lastNumber + 1,
+            $model->id,
             $date
         );
     }
