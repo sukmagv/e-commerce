@@ -17,7 +17,7 @@ class PaymentProofRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'proof_link' => ['required', 'file', 'max:2048'],
+            'proof_link' => ['required', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:2048'],
             'type'       => ['required', 'string', Rule::enum(PaymentType::class)],
             'note'       => ['nullable', 'string', 'max:100'],
         ];

@@ -18,7 +18,7 @@ class OtpRequest extends FormRequest
     {
         return [
             'otp_id' => ['nullable', 'integer'],
-            'address' => ['required', 'email', 'unique:otps,address'],
+            'address' => ['required', 'email'],
             'type' => ['required', Rule::enum(OtpType::class)],
         ];
     }
