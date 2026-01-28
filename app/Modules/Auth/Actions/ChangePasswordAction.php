@@ -22,7 +22,7 @@ class ChangePasswordAction
         try {
             if (!Hash::check($dto->currentPassword, $user->password)) {
                 throw ValidationException::withMessages([
-                    'current_password' => ['Current password is incorrect.'],
+                    'currentPassword' => ['Current password is incorrect.'],
                 ]);
             }
 

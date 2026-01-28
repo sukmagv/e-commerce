@@ -18,7 +18,7 @@ return new class extends Migration
             $table->string('slug')->unique();
             $table->string('name');
             $table->string('photo');
-            $table->unsignedBigInteger('price');
+            $table->float('price');
             $table->boolean('is_discount')->default(true);
             $table->boolean('is_active')->default(true);
             $table->timestamps();

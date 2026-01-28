@@ -138,6 +138,11 @@ return [
             'path' => storage_path('logs/laravel.log'),
         ],
 
+        'order' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/order.log'),
+            'level' => 'info',
+        ],
     ],
 
 ];

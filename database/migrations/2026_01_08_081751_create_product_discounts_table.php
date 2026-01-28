@@ -15,8 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('product_id')->constrained()->cascadeOnDelete();
             $table->string('type');
-            $table->unsignedBigInteger('amount');
-            $table->unsignedBigInteger('final_price');
+            $table->float('amount');
+            $table->float('final_price');
             $table->timestamps();
             $table->softDeletes('deleted_at');
         });

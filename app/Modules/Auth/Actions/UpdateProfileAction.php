@@ -2,39 +2,46 @@
 
 namespace App\Modules\Auth\Actions;
 
-use App\Services\FileService;
+use App\Modules\Auth\DTOs\UpdateProfileDTO;
+use App\Modules\Auth\Models\Customer;
 use App\Modules\Auth\Models\User;
+use App\Services\FileService;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
-use App\Http\Requests\Customer\v1\UpdateProfileRequest;
 
 class UpdateProfileAction
 {
-    public function __construct(protected FileService $fileService)
-    {}
+    public function __construct(protected FileService $fileService) {}
 
     /**
      * Update one or more customer profile
      *
-     * @param \App\Modules\Auth\Models\User $user
-     * @param \App\Http\Requests\Customer\v1\UpdateProfileRequest $request
-     * @return \App\Modules\Auth\Models\User
+     * @param  \App\Modules\Auth\Models\User  $user
+     * @param  \App\Http\Requests\Api\Customer\V1\UpdateProfileRequest  $request
      */
-    public function execute(User $user, UpdateProfileRequest $request): User
+    public function execute(UpdateProfileDTO $dto): User
     {
         DB::beginTransaction();
         try {
-            $user->update($request->only('name'));
+            /** @var \App\Modules\Auth\Models\User $user */
+            $user = Auth::user();
 
-            $customerData = $request->only('phone');
-
-            $oldPath = $user->customer->photo;
-
-            if ($request->hasFile('photo') && $request->file('photo') instanceof UploadedFile) {
-                $customerData['photo'] = $this->fileService->updateOrCreate($request->photo, $oldPath, 'profile');
+            if ($dto->name !== null) {
+                $user->update(['name' => $dto->name]);
             }
 
-            if ($user->customer && $customerData) {
+            if ($dto->phone !== null) {
+                $customerData['phone'] = $dto->phone;
+            }
+
+            $oldPath = $user->customer?->photo;
+
+            if ($dto->photo && $dto->photo instanceof UploadedFile) {
+                $customerData['photo'] = $this->fileService->updateOrCreate($dto->photo, $oldPath, Customer::IMAGE_PATH);
+            }
+
+            if ($user->customer && ! empty($customerData)) {
                 $user->customer->update($customerData);
             }
 

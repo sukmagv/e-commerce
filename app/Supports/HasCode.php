@@ -3,9 +3,16 @@
 namespace App\Supports;
 
 use Illuminate\Support\Carbon;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 trait HasCode
 {
+    /**
+     * Prefix for code by models
+     *
+     * @return array
+     */
     protected static function codePrefixes(): array
     {
         return [
@@ -16,23 +23,57 @@ trait HasCode
         ];
     }
 
+    /**
+     * Boot generate data method
+     *
+     * @return void
+     */
     protected static function bootHasCode()
     {
-        static::creating(function ($model) {
-            $modelName = class_basename($model);
-
-            $prefix = $model->codePrefixes()[$modelName];
-
-            $model->code = static::generateCode($prefix);
-        });
+        static::creating(fn ($model) => static::setCodeIfEmpty($model));
+        static::created(fn ($model) => static::finalizeCode($model));
     }
 
-    protected static function generateCode(string $prefix): string
+    protected static function setCodeIfEmpty($model): void
     {
-        $nextId = (static::max('id') ?? 0) + 1;
-        $nextIdPadded = str_pad($nextId, 3, '0', STR_PAD_LEFT);
-        $date = Carbon::now()->format('Ymd');
+        if (!empty($model->code)) {
+            return;
+        }
 
-        return sprintf('%s-%s-%s', $prefix, $nextIdPadded, $date);
+        $model->code = static::buildCode($model);
+    }
+
+    protected static function finalizeCode($model): void
+    {
+        if (str_contains($model->code, '-000-')) {
+            $model->updateQuietly([
+                'code' => static::buildCode($model),
+            ]);
+        }
+    }
+
+    protected static function buildCode($model): string
+    {
+        $prefix = static::codePrefixes()[class_basename($model)] ?? '';
+
+        return static::generateCode($prefix, $model);
+    }
+
+    /**
+     * Generate data based on model prefix and date
+     *
+     * @param string $prefix
+     * @return string
+     */
+    protected static function generateCode(string $prefix, Model $model): string
+    {
+        $date = Carbon::now()->format('dmy');
+
+        return sprintf(
+            '%s-%03d-%s',
+            $prefix,
+            $model->id,
+            $date
+        );
     }
 }
