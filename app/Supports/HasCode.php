@@ -30,33 +30,15 @@ trait HasCode
      */
     protected static function bootHasCode()
     {
-        static::creating(fn ($model) => static::setCodeIfEmpty($model));
-        static::created(fn ($model) => static::finalizeCode($model));
-    }
+        $getCode = function ($model) {
+            $prefix = static::codePrefixes()[class_basename($model)] ?? '';
+            return static::generateCode($prefix, $model);
+        };
 
-    protected static function setCodeIfEmpty($model): void
-    {
-        if (!empty($model->code)) {
-            return;
-        }
+        static::creating(fn ($model) => $model->code ??= $getCode($model));
 
-        $model->code = static::buildCode($model);
-    }
+        static::created(fn ($model) => $model->updateQuietly(['code' => $getCode($model)]));
 
-    protected static function finalizeCode($model): void
-    {
-        if (str_contains($model->code, '-000-')) {
-            $model->updateQuietly([
-                'code' => static::buildCode($model),
-            ]);
-        }
-    }
-
-    protected static function buildCode($model): string
-    {
-        $prefix = static::codePrefixes()[class_basename($model)] ?? '';
-
-        return static::generateCode($prefix, $model);
     }
 
     /**
@@ -67,7 +49,7 @@ trait HasCode
      */
     protected static function generateCode(string $prefix, Model $model): string
     {
-        $date = Carbon::now()->format('dmy');
+        $date = Carbon::now()->format('Ymd');
 
         return sprintf(
             '%s-%03d-%s',
