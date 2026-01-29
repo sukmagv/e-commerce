@@ -2,14 +2,15 @@
 
 namespace App\Providers;
 
+use App\Observers\OrderObserver;
 use Illuminate\Support\Facades\DB;
+use App\Modules\Order\Models\Order;
 use Illuminate\Support\Facades\Log;
+use App\Modules\Auth\Models\Customer;
 use Illuminate\Support\Facades\Route;
-use Illuminate\Support\Facades\Schema;
 use App\Modules\Product\Models\Product;
-use App\Modules\Product\Models\ProductCategory;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\Validator;
+use App\Modules\Product\Models\ProductCategory;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -33,9 +34,13 @@ class AppServiceProvider extends ServiceProvider
             ]);
         });
 
+        Order::observe(OrderObserver::class);
+
         $models = [
+            'customer' => Customer::class,
             'product'  => Product::class,
             'product-category'  => ProductCategory::class,
+            'order' => Order::class,
         ];
 
         foreach ($models as $key => $modelClass) {

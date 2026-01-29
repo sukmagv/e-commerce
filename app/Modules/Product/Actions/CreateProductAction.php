@@ -2,18 +2,17 @@
 
 namespace App\Modules\Product\Actions;
 
-use App\Services\FileService;
-use InvalidArgumentException;
-use Illuminate\Support\Facades\DB;
-use App\Modules\Product\Models\Product;
 use App\Modules\Product\DTOs\CreateProductDTO;
-use App\Modules\Product\Enums\DiscountType;
+use App\Modules\Product\Models\Product;
 use App\Modules\Product\Models\ProductDiscount;
+use App\Services\FileService;
+use App\Supports\DiscountValidation;
+use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\DB;
 
 class CreateProductAction
 {
-    public function __construct(protected FileService $fileService)
-    {}
+    public function __construct(protected FileService $fileService) {}
 
     /**
      * Create new product data
@@ -27,28 +26,22 @@ class CreateProductAction
 
         DB::beginTransaction();
         try {
-            $product = new Product([
-                'category_id' => $dto->category_id,
-                'name' => $dto->name,
-                'price' => $dto->price,
-                'is_discount' => $dto->is_discount,
-            ]);
+            $product = new Product($dto->toArray());
 
-            if ($dto->photo) {
-                $path = $this->fileService->updateOrCreate($dto->photo, null, 'products');
+            if ($dto->photo instanceof UploadedFile) {
+                $path = $this->fileService->updateOrCreate($dto->photo, null, Product::IMAGE_PATH);
                 $product->photo = $path;
             }
 
             $product->save();
 
-            if ($dto->is_discount) {
-                $discount = new ProductDiscount([
-                    'type'        => $dto->type,
-                    'amount'      => $dto->amount,
-                    'final_price' => $dto->final_price,
-                ]);
+            if ($dto->isDiscount) {
+                DiscountValidation::calculateFinalPrice($product->price, $dto->discount);
+
+                $discount = new ProductDiscount($dto->discount->toArray());
 
                 $discount->product()->associate($product);
+
                 $discount->save();
             }
 
@@ -66,38 +59,4 @@ class CreateProductAction
 
         return $product;
     }
-
-    /**
-     * Validate discount final price calculation
-     *
-     * @param \App\Modules\Product\DTOs\CreateProductDTO $dto
-     * @return void
-     */
-    // protected function validateDiscountCalculation(CreateProductDTO $dto): void
-    // {
-    //     if (!$dto->is_discount) {
-    //         return;
-    //     }
-
-    //     $expectedFinalPrice = match ($dto->type) {
-    //         DiscountType::NOMINAL => $dto->price - $dto->amount,
-
-    //         DiscountType::PERCENTAGE => $dto->price - ($dto->price * $dto->amount / 100),
-
-    //         default => $dto->price,
-    //     };
-
-    //     // pengecekan untuk mencegah harga barang negatif setelah diberi diskon
-    //     if ($expectedFinalPrice < 0) {
-    //         throw new InvalidArgumentException(
-    //             "The discount amount exceeds the product price."
-    //         );
-    //     }
-
-    //     if (round($expectedFinalPrice) !== round($dto->final_price)) {
-    //         throw new InvalidArgumentException(
-    //             "The final price calculation is not valid. Expected price = " . $expectedFinalPrice
-    //         );
-    //     }
-    // }
 }

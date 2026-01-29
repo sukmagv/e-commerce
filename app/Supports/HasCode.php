@@ -3,9 +3,16 @@
 namespace App\Supports;
 
 use Illuminate\Support\Carbon;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 trait HasCode
 {
+    /**
+     * Prefix for code by models
+     *
+     * @return array
+     */
     protected static function codePrefixes(): array
     {
         return [
@@ -16,23 +23,39 @@ trait HasCode
         ];
     }
 
+    /**
+     * Boot generate data method
+     *
+     * @return void
+     */
     protected static function bootHasCode()
     {
-        static::creating(function ($model) {
-            $modelName = class_basename($model);
+        $getCode = function ($model) {
+            $prefix = static::codePrefixes()[class_basename($model)] ?? '';
+            return static::generateCode($prefix, $model);
+        };
 
-            $prefix = $model->codePrefixes()[$modelName];
+        static::creating(fn ($model) => $model->code ??= $getCode($model));
 
-            $model->code = static::generateCode($prefix);
-        });
+        static::created(fn ($model) => $model->updateQuietly(['code' => $getCode($model)]));
+
     }
 
-    protected static function generateCode(string $prefix): string
+    /**
+     * Generate data based on model prefix and date
+     *
+     * @param string $prefix
+     * @return string
+     */
+    protected static function generateCode(string $prefix, Model $model): string
     {
-        $nextId = (static::max('id') ?? 0) + 1;
-        $nextIdPadded = str_pad($nextId, 3, '0', STR_PAD_LEFT);
         $date = Carbon::now()->format('Ymd');
 
-        return sprintf('%s-%s-%s', $prefix, $nextIdPadded, $date);
+        return sprintf(
+            '%s-%03d-%s',
+            $prefix,
+            $model->id,
+            $date
+        );
     }
 }

@@ -1,10 +1,12 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Customer\v1\OtpController;
-use App\Http\Controllers\Customer\v1\AuthController;
-use App\Http\Controllers\Customer\v1\ProductController;
-use App\Http\Controllers\Customer\v1\ProfileController;
+use App\Http\Controllers\Api\Customer\V1\OtpController;
+use App\Http\Controllers\Api\Customer\V1\AuthController;
+use App\Http\Controllers\Api\Customer\V1\BankController;
+use App\Http\Controllers\Api\Customer\V1\OrderController;
+use App\Http\Controllers\Api\Customer\V1\ProductController;
+use App\Http\Controllers\Api\Customer\V1\ProfileController;
 
 Route::post('otp/send', [OtpController::class, 'sendOtp']);
 Route::post('otp/verify', [OtpController::class, 'verifyOtp']);
@@ -18,7 +20,7 @@ Route::prefix('auth')->group(function () {
     });
 });
 
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware(['auth:sanctum', 'role:customer'])->group(function () {
     Route::prefix('auth')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout']);
 
@@ -28,5 +30,13 @@ Route::middleware('auth:sanctum')->group(function () {
             Route::post('/profile', 'changePassword');
         });
     });
+
     Route::resource('products', ProductController::class)->only(['index', 'show']);
+
+    Route::resource('orders', OrderController::class);
+
+    Route::post('orders/{order}/upload-proof', [OrderController::class, 'uploadProof']);
+    Route::post('orders/{order}/pdf', [OrderController::class, 'printPdf']);
+
+    Route::get('/bank-accounts', [BankController::class, 'index']);
 });

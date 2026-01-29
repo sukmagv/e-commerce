@@ -2,19 +2,13 @@
 
 namespace App\Modules\Auth\DTOs;
 
+use App\Supports\BaseDTO;
 use Illuminate\Http\Request;
 
-class ResetPasswordDTO
+class ResetPasswordDTO extends BaseDTO
 {
-    public int $otp_id;
-    public string $password;
-
-    public static function fromRequest(Request $request): self
-    {
-        $dto = new self();
-        $dto->otp_id = $request->input('otp_id');
-        $dto->password = $request->input('password');
-
-        return $dto;
-    }
+    public function __construct(
+        public int $otpId,
+        public string $password,
+    ) {}
 }
