@@ -52,6 +52,8 @@ class OrderExcelReport implements
             'Order Code',
             'Customer Name',
             'Items',
+            'Price',
+            'Discount',
             'Grand Total',
             'Payment Status',
             'Created At',
@@ -64,6 +66,8 @@ class OrderExcelReport implements
             $order->code,
             $order->user->name,
             $order->orderItem?->product?->name ?? '-',
+            $order->orderItem->total_price,
+            $order->orderItem->discount_price,
             $order->grand_total,
             $order->payment?->proof->status->value ?? 'N/A',
             $order->created_at->format('Y-m-d'),
@@ -78,7 +82,9 @@ class OrderExcelReport implements
             'C' => 30,
             'D' => 15,
             'E' => 15,
-            'F' => 25,
+            'F' => 15,
+            'G' => 25,
+            'H' => 25,
         ];
     }
 
@@ -102,7 +108,8 @@ class OrderExcelReport implements
         return [
             'A' => NumberFormat::FORMAT_TEXT,
             'D' => NumberFormat::FORMAT_NUMBER,
-            'F' => NumberFormat::FORMAT_DATE_DDMMYYYY,
+            'E' => NumberFormat::FORMAT_NUMBER,
+            'H' => NumberFormat::FORMAT_DATE_DDMMYYYY,
         ];
     }
 }
