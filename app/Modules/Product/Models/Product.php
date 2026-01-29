@@ -103,6 +103,12 @@ class Product extends Model
      */
     public function snapshot(): array
     {
-        return Arr::only($this->toArray(),self::SNAPSHOT_FIELDS);
+        $data = Arr::only($this->toArray(), self::SNAPSHOT_FIELDS);
+
+        $data['category'] = $this->category ? $this->category->only([
+            'code', 'name',
+        ]) : null;
+
+        return $data;
     }
 }
