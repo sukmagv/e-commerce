@@ -7,6 +7,8 @@ use App\Supports\HasSlug;
 use App\Supports\HasSearch;
 use Illuminate\Support\Arr;
 use App\Modules\Order\Models\OrderItem;
+use App\Supports\HasDateBetween;
+use App\Supports\HasSorting;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Database\Eloquent\Builder;
@@ -19,7 +21,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Product extends Model
 {
-    use HasFactory, HasCode, SoftDeletes, HasSlug, HasSearch;
+    use HasFactory, HasCode, SoftDeletes, HasSlug, HasSearch, HasSorting, HasDateBetween;
 
     protected $fillable = [
         'category_id',

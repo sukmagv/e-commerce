@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Modules\Auth\Models\Customer;
 use App\Http\Resources\Api\Auth\V1\CustomerResource;
+use Illuminate\Http\Request;
 
 class CustomerController extends Controller
 {
@@ -15,9 +16,30 @@ class CustomerController extends Controller
      *
      * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
      */
-    public function index()
+    public function index(Request $request)
     {
-        return CustomerResource::collection(Customer::paginate(20));
+        $request->validate([
+            'search'     => ['sometimes', 'string'],
+            'sort_by'    => ['sometimes', 'string'],
+            'sort_order' => ['sometimes', 'in:asc,desc'],
+            'start_date' => ['sometimes', 'date'],
+            'end_date'   => ['sometimes', 'date', 'after_or_equal:start_date'],
+            'limit'      => ['sometimes', 'numeric']
+        ]);
+
+        $allowedFields = [
+            'user_id'  => 'user_id',
+            'code' => 'code',
+            'name' => 'user.name'
+        ];
+
+        $customers = Customer::with('user')
+            ->search($request->search)
+            ->sortByRequest($request, $allowedFields)
+            ->dateBetween($request->input('start_date'), $request->input('end_date'))
+            ->paginate($request->limit ?? 20);
+
+        return CustomerResource::collection($customers);
     }
 
     /**

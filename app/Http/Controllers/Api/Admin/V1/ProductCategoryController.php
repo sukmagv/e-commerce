@@ -14,9 +14,26 @@ class ProductCategoryController extends Controller
      *
      * @return \Illuminate\Http\Resources\Json\AnonymousResourceCollection
      */
-    public function index()
+    public function index(Request $request)
     {
-        return ProductCategoryResource::collection(ProductCategory::paginate(20));
+        $request->validate([
+            'search'     => ['sometimes', 'string'],
+            'sort_by'    => ['sometimes', 'string'],
+            'sort_order' => ['sometimes', 'in:asc,desc'],
+            'start_date' => ['sometimes', 'date'],
+            'end_date'   => ['sometimes', 'date', 'after_or_equal:start_date'],
+            'limit'      => ['sometimes', 'numeric'],
+        ]);
+
+        $allowedFields = ['code', 'name'];
+
+        $categories = ProductCategory::query()
+            ->search($request->query('search'))
+            ->sortByRequest($request, $allowedFields)
+            ->dateBetween($request->input('start_date'), $request->input('end_date'))
+            ->paginate($request->query('limit', 10));
+
+        return ProductCategoryResource::collection($categories);
     }
 
     /**

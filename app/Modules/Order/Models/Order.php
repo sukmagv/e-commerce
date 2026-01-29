@@ -12,13 +12,14 @@ use App\Modules\Auth\Models\Customer;
 use App\Modules\Order\Models\OrderItem;
 use Illuminate\Database\Eloquent\Model;
 use App\Modules\Order\Enums\OrderStatus;
+use App\Supports\HasSorting;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Order extends Model
 {
-    use HasFactory, HasCode, HasSearch, HasStatus, HasDateBetween, EnsureStatus;
+    use HasFactory, HasCode, HasSearch, HasStatus, HasDateBetween, HasSorting, EnsureStatus;
 
     const TAX = 11 / 100;
 

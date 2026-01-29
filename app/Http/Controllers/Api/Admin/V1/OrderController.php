@@ -28,13 +28,20 @@ class OrderController extends Controller
         $request->validate([
             'search'     => ['sometimes', 'string'],
             'status'     => ['sometimes', 'string', Rule::enum(OrderStatus::class)],
+            'sort_by'    => ['sometimes', 'string'],
+            'sort_order' => ['sometimes', 'in:asc,desc'],
+            'start_date' => ['sometimes', 'date'],
+            'end_date'   => ['sometimes', 'date', 'after_or_equal:start_date'],
             'limit'      => ['sometimes', 'numeric']
         ]);
+
+        $allowedFields = ['category_id', 'code', 'name', 'price'];
 
         $orders = Order::with(['user', 'payment.proof'])
             ->search($request->query('search'))
             ->status($request->query('status'))
-            ->latest()
+            ->sortByRequest($request, $allowedFields)
+            ->dateBetween($request->input('start_date'), $request->input('end_date'))
             ->paginate($request->query('limit', 10));
 
         return OrderResource::collection($orders);
