@@ -2,6 +2,7 @@
 
 namespace App\Supports;
 
+use BackedEnum;
 use Illuminate\Validation\ValidationException;
 
 trait EnsureStatus
@@ -9,14 +10,14 @@ trait EnsureStatus
     /**
      * Check data status
      *
-     * @param string $expectedStatus
+     * @param BackedEnum $expectedStatus
      * @return void
      */
-    public function ensureStatus(string $expectedStatus): void
+    public function ensureStatus(BackedEnum $expectedStatus): void
     {
-        if ($this->status->value !== $expectedStatus) {
+        if ($this->status !== $expectedStatus) {
             throw ValidationException::withMessages([
-                'message' => 'Invalid status. Expected status: ' . $expectedStatus
+                'message' => 'Invalid status.'
             ]);
         }
     }

@@ -23,7 +23,7 @@ class ChangeOrderStatusAction
      */
     public function execute(Order $order, array $paymentData): Order
     {
-        $order->ensureStatus(OrderStatus::IN_PROGRESS->value);
+        $order->ensureStatus(OrderStatus::IN_PROGRESS);
 
         $proof = $order->payment->proof;
 
