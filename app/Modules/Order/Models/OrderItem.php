@@ -3,10 +3,11 @@
 namespace App\Modules\Order\Models;
 
 use App\Modules\Product\Models\Product;
-use App\Modules\Product\Models\ProductDiscount;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use App\Modules\Order\DTOs\ProductSnapshotDTO;
+use App\Modules\Product\Models\ProductDiscount;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class OrderItem extends Model
 {
@@ -29,7 +30,6 @@ class OrderItem extends Model
         'normal_price' => 'float',
         'discount_price' => 'float',
         'final_price' => 'float',
-        'product_snapshot' => 'array',
     ];
 
     public function order(): BelongsTo
@@ -45,5 +45,17 @@ class OrderItem extends Model
     public function discount(): BelongsTo
     {
         return $this->belongsTo(ProductDiscount::class)->withTrashed();
+    }
+
+    public function getProductSnapshotAttribute($value): ProductSnapshotDTO
+    {
+        $data = is_array($value) ? $value : json_decode($value, true);
+
+        return ProductSnapshotDTO::fromArray($data);
+    }
+
+    public function setProductSnapshotAttribute(ProductSnapshotDTO $value): void
+    {
+        $this->attributes['product_snapshot'] = json_encode($value->toArray());
     }
 }
